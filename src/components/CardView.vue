@@ -5,11 +5,6 @@
             <h5>{{ item.name }}</h5>
             <router-link class="btn" :to="item.route">View Product</router-link>
         </div>
-        <!-- <img src="@/assets/images/switch_londonfog.webp" class="card-img-top" alt=""> -->
-        <!-- <div class="card-body">
-            <h5 class="card-title">Owlab Neon Switch</h5>
-            <router-link class="btn" to="/switches"><h5>Owlab Neon</h5></router-link>
-        </div> -->
     </div>
 </template>
 

@@ -6,7 +6,7 @@
                 <span class="logo1">CARROT</span><span class="logo2">KEEBS</span>
             </router-link>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+                    <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <ul class="navbar-nav ms-auto">
@@ -14,16 +14,17 @@
                         <router-link class="nav-link" to="/">HOME</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/switches">KEYBOARDS</router-link>
+                        <router-link class="nav-link" to="/products">PRODUCTS</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/switches">SWITCHES</router-link>
+                        <router-link class="nav-link" to="/switches">CART</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/switches">KEYCAPS</router-link>
+                        <router-link class="nav-link" to="/switches">LOGOUT</router-link>
                     </li>
                 </ul>
             </div>
+            
         </div>
     </nav>
 </template>
@@ -90,9 +91,5 @@ a.navbar-brand {
 
 .navbar .nav-link.router-link-exact-active {
     color: black;
-}
-
-button .navbar-toggler {
-    background-color: transparent;
 }
 </style>
