@@ -1,0 +1,15 @@
+{
+    "products" : [
+        { "id": 1, "name": "Owlab Neon Switch", "brand": "Owlab", "imgURL": "https://ucarecdn.com/a376e081-a7fd-4086-bc2f-574a7542e2d1~4/nth/0/-/format/auto/-/quality/lighter/", "category": "switch", "price": 2.30, "status": "active", "stock": 50, "featured": false, "carousel": false},
+        { "id": 2, "name": "Bolsa Supply Zakus", "brand": "Bolsa Supply", "imgURL": "https://www.ashkeebs.com/wp-content/uploads/2021/08/Zaku-Switch-Product-Image-2.jpg", "category": "switch", "price": 2.80, "status": "active", "stock": 100, "featured": true, "carousel": false},
+        { "id": 3, "name": "C3 Equalz Tangerine", "brand": "TKC", "imgURL": "https://zionstudios.ph/wp-content/uploads/2021/01/DSC04647-scaled.jpg", "category": "switch", "price": 2.80, "status": "active", "stock": 100, "featured": false, "carousel": true},
+        { "id": 4, "name": "PBTFans Spark Light", "brand": "PBTFans", "imgURL": "https://i.shgcdn.com/18f0acec-7dec-43cb-9466-dbc8ae9db046/-/format/auto/-/preview/3000x3000/-/quality/best/", "category": "keycap", "price": 399.99, "status": "active", "stock": 10, "featured": true, "carousel": false},
+        { "id": 5, "name": "PBTFans WOB", "brand": "PBTFans", "imgURL": "https://cdn.shopify.com/s/files/1/1473/3902/products/lQDPJxZYJuPCgITNB9DNB9CwmMN7lwKYtgUCkX6PK8DTAA_2000_2000.jpg?v=1680058112", "category": "keycap", "price": 300.99, "status": "active", "stock": 20, "featured": false, "carousel": false},
+        { "id": 6, "name": "PBTFans Resonance", "brand": "PBTFans", "imgURL": "https://cdn.shopify.com/s/files/1/1473/3902/products/01_25dfe2e4-27c1-4a31-9fd3-ae11e59bd292.jpg?v=1654652638", "category": "keycap", "price": 449.99, "status": "active", "stock": 5, "featured": true, "carousel": true},
+        { "id": 7, "name": "GMK Kitsune", "brand": "GMK", "imgURL": "https://cdn.shopify.com/s/files/1/1473/3902/products/BaseKit_e3f9f235-0d5e-407c-8557-9044ab9970b0.jpg?v=1675757941", "category": "keycap", "price": 749.99, "status": "active", "stock": 2, "featured": false, "carousel": false},
+        { "id": 8, "name": "GMK Arch", "brand": "GMK", "imgURL": "https://cdn.shopify.com/s/files/1/1473/3902/products/6_e64a1782-444e-4e4d-83be-5b8453afeb7d.png?v=1619075230", "category": "keycap", "price": 699.99, "status": "active", "stock": 3, "featured": false, "carousel": false},
+        { "id": 9, "name": "QK80", "brand": "QK", "imgURL": "https://cdn.store-assets.com/s/402514/i/54637624.png?width=1024", "category": "keyboard", "price": 1150.00, "status": "active", "stock": 1, "featured": false, "carousel": false},
+        { "id": 10, "name": "Cloudline", "brand": "JJW", "imgURL": "https://cdn.shopify.com/s/files/1/0238/7342/1376/products/gray-1.png?v=1633553401", "category": "keyboard", "price": 3000.00, "status": "active", "stock": 1, "featured": false, "carousel": false},
+        { "id": 11, "name": "Kohaku", "brand": "SingaKBD", "imgURL": "https://cdn.shopify.com/s/files/1/0061/5687/7924/files/01G_KHK_0598_F1_1024x1024.jpg?v=1679896084", "category": "keyboard", "price": 2500.00, "status": "active", "stock": 1, "featured": false, "carousel": true}
+    ]
+}

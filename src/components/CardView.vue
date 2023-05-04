@@ -1,9 +1,9 @@
 <template>
     <div class="card">
-        <img :src="item.imgPath" class="card-img-top" alt="">
+        <img :src="product.imgURL" class="card-img-top" alt="">
         <div class="item-body">
-            <h5>{{ item.name }}</h5>
-            <router-link class="btn" :to="item.route">View Product</router-link>
+            <h5>{{ product.name }}</h5>
+            <router-link class="btn" to="/">View Product</router-link>
         </div>
     </div>
 </template>
@@ -11,7 +11,7 @@
 <script>
 export default {
   props: {
-    item: {
+    product: {
         type: Object,
         required: true
     }
@@ -29,13 +29,6 @@ export default {
     box-shadow: 0px 6px 11px 0px rgba(0,0,0,0.7);
     -webkit-box-shadow: 0px 6px 11px 0px rgba(0,0,0,0.7);
     -moz-box-shadow: 0px 6px 11px 0px rgba(0,0,0,0.7);
-} 
-
-.card img {
-    height: 350px;
-    width: auto;
-    border-radius: 5px;
-    object-fit: cover;
 }
 
 .item-body {
