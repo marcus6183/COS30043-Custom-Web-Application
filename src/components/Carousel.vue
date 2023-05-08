@@ -1,15 +1,15 @@
 <template>
    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
         <div class="carousel-indicators">
-            <button v-for="(products, index) in carouselProducts" :key="index" type="button" data-bs-target="#carouselExampleCaptions" :data-bs-slide-to="index" :class="{ active: index === 0 }" aria-label="Slide {{ index + 1 }}"></button>
+            <button v-for="(product, index) in carouselProducts" :key="index" type="button" data-bs-target="#carouselExampleCaptions" :data-bs-slide-to="index" :class="{ active: index === 0 }" aria-label="Slide {{ index + 1 }}"></button>
         </div>
         <div class="carousel-inner">
-            <div v-for="(products, index) in carouselProducts" :key="index" :class="index === 0 ? 'carousel-item active' : 'carousel-item'">
-                <router-link to="/">
-                    <img :src="products.imgURL" class="d-block w-100" alt="">
+            <div v-for="(product, index) in carouselProducts" :key="index" :class="index === 0 ? 'carousel-item active' : 'carousel-item'">
+                <router-link :to="{ name: 'ProductDetails', params: { id: product.id }}">
+                    <img :src="product.imgURL" class="d-block w-100" alt="">
                 </router-link>
                 <div class="carousel-caption d-none d-md-block">
-                    <h5>{{ products.name }}</h5>
+                    <h5>{{ product.name }}</h5>
                     <p>In Stock Now!</p>
                 </div>
             </div>

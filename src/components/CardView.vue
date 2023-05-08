@@ -3,7 +3,8 @@
         <img :src="product.imgURL" class="card-img-top" alt="">
         <div class="item-body">
             <h5>{{ product.name }}</h5>
-            <router-link class="btn" to="/">View Product</router-link>
+            
+            <router-link class="btn" :to="{ name: 'ProductDetails', params: { id: product.id }}">View Product</router-link>
         </div>
     </div>
 </template>
@@ -26,9 +27,9 @@ export default {
     border: 0px;
     border-radius: 5px;
     margin: 0;
-    box-shadow: 0px 6px 11px 0px rgba(0,0,0,0.7);
-    -webkit-box-shadow: 0px 6px 11px 0px rgba(0,0,0,0.7);
-    -moz-box-shadow: 0px 6px 11px 0px rgba(0,0,0,0.7);
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
 }
 
 .item-body {
@@ -55,5 +56,11 @@ export default {
 
 .btn:hover {
     background-color: var(--accentColor1); /* new background color on hover */
+}
+
+img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
 }
 </style>

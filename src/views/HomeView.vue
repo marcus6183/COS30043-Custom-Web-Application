@@ -46,7 +46,7 @@ export default {
 
 <style scoped>
 .home {
-	height: auto;
+	min-height: 100vh;
 }
 
 .col-xl-3

@@ -1,14 +1,14 @@
 <template>
     <div class="card">
         <div class="img-box">
-            <router-link to="/">
+            <router-link :to="{ name: 'ProductDetails', params: { id: prodId }}">
                 <img :src="prodImgURL" class="card-img-top" alt="">
             </router-link>
         </div>
         <!-- <img :src="prodImgURL" class="card-img-top" alt=""> -->
         <div class="card-body">
             <h5 class="card-title">{{ prodName }}</h5>
-            <router-link class="btn" to="/">RM{{ prodPrice.toFixed(2) }}</router-link>
+            <router-link class="btn" :to="{ name: 'ProductDetails', params: { id: prodId }}">RM{{ prodPrice.toFixed(2) }}</router-link>
         </div>
     </div>
 </template>
@@ -25,11 +25,15 @@ export default {
     width: 18rem;
     border: 0px;
     border-radius: 0px;
-    transition: all 0.4s;
+    transition: all 0.3s;
+    overflow: hidden;
 }
 
 .card:hover {
+    border-radius: 5px;
     box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
 }
 
 .img-box {

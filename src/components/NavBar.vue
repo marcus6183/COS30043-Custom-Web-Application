@@ -14,7 +14,7 @@
                         <router-link class="nav-link" to="/">HOME</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/products">PRODUCTS</router-link>
+                        <router-link class="nav-link" :to="{ name: 'ProductView' }">PRODUCTS</router-link>
                     </li>
                     <li class="nav-item">
                         <router-link class="nav-link" to="/switches">CART</router-link>
