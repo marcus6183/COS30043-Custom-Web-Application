@@ -11,5 +11,108 @@
         { "id": 9, "name": "QK80", "brand": "QK", "imgURL": "https://cdn.store-assets.com/s/402514/i/54637624.png?width=1024", "category": "keyboard", "price": 1150.00, "status": "active", "stock": 1, "featured": false, "carousel": false},
         { "id": 10, "name": "Cloudline", "brand": "JJW", "imgURL": "https://cdn.shopify.com/s/files/1/0238/7342/1376/products/gray-1.png?v=1633553401", "category": "keyboard", "price": 3000.00, "status": "active", "stock": 1, "featured": false, "carousel": false},
         { "id": 11, "name": "Kohaku", "brand": "SingaKBD", "imgURL": "https://cdn.shopify.com/s/files/1/0061/5687/7924/files/01G_KHK_0598_F1_1024x1024.jpg?v=1679896084", "category": "keyboard", "price": 2500.00, "status": "active", "stock": 1, "featured": false, "carousel": true}
+    ],
+    "productDescription" : [
+        { "id": 1,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 2,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 3,
+          "description": [
+            "Linear switch with a 62 or 67g spring. These have a smooth keypress with no tactile bump.",
+            "Ultra-high-molecular-weight polyethylene housing. This material is used in places where the plastic is required to be extremely tough with high abrasion and wear resistance. Applications for this type of plastic spans from joint replacement to marine structures for ship mooring.", 
+            "POM (polyoxymethylene) stem. Another staple in engineering thermoplastics, known for low-friction capabilities and outstanding stability.",
+            "PCB mount.",
+            "Pre-lubed in factory – very light application. You can lube these switches on top of this.",
+            "Packaged in a new hard plastic case with a sticker snap lid. Easily reusable and perfect for holding spare switches.",
+            "Designed by C³Equalz and manufactured by JWK."
+          ]
+        },
+        { "id": 4,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 5,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 6,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 7,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 8,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 9,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 10,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        },
+        { "id": 11,
+          "description": [
+            "description 1",
+            "description 2",
+            "description 3",
+            "description 4",
+            "description 5"
+          ]
+        }
     ]
 }

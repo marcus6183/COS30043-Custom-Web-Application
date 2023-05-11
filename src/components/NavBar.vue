@@ -1,5 +1,5 @@
 <template>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
         <div class="container-fluid">
             <router-link class="navbar-brand" to="/">
                 <img class="logoImage" src="@/assets/images/logo_img.png" alt="">
@@ -40,6 +40,10 @@ export default {
 .logoImage {
     width: 50px;
     height: 60px;
+}
+
+.navbar {
+    background: #fff;
 }
 
 a.navbar-brand {
