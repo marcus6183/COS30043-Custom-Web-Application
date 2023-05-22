@@ -6,7 +6,9 @@
 
 <script>
 import NavBar from '@/components/NavBar.vue'; // Importing NavBar component
-import Footer from './components/Footer.vue';
+import Footer from './components/Footer.vue'; // Importing Footer component
+// import { collection, getDocs } from 'firebase/firestore';
+// import { db } from '@/firebase';
 
 export default {
   name: 'App',
