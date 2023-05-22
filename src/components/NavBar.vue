@@ -17,10 +17,10 @@
                         <router-link class="nav-link" :to="{ name: 'ProductView' }">PRODUCTS</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/switches">CART</router-link>
+                        <router-link class="nav-link" :to="{ name: 'Cart' }">CART</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link class="nav-link" to="/switches">LOGOUT</router-link>
+                        <router-link class="nav-link" :to="{ name: 'HomeView'}">LOGOUT</router-link>
                     </li>
                 </ul>
             </div>

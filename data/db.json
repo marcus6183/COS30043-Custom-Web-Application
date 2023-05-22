@@ -114,5 +114,13 @@
             "description 5"
           ]
         }
+    ],
+    "cartItems" : [
+      { "prodID" : 1, "userID" : 1, "qty" : 10, "dateAdded" : "2023-05-19T15:22:20.000Z" },
+      { "prodID" : 2, "userID" : 1, "qty" : 20, "dateAdded" : "2023-05-19T15:23:20.000Z" },
+      { "prodID" : 3, "userID" : 1, "qty" : 30, "dateAdded" : "2023-05-19T15:24:20.000Z" },
+      { "prodID" : 4, "userID" : 1, "qty" : 1, "dateAdded" : "2023-05-19T15:25:20.000Z" },
+      { "prodID" : 5, "userID" : 1, "qty" : 1, "dateAdded" : "2023-05-19T15:26:20.000Z" },
+      { "prodID" : 6, "userID" : 1, "qty" : 1, "dateAdded" : "2023-05-19T15:27:20.000Z" }
     ]
 }

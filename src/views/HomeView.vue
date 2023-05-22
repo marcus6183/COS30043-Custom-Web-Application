@@ -28,18 +28,18 @@ export default {
 		}
 	},
 	mounted() {
-				fetch('http://localhost:3000/products')
-						.then(res => res.json())
-						.then(data => this.products = data)
-						.catch(err => console.log(err.message))
+		fetch('http://localhost:3000/products')
+				.then(res => res.json())
+				.then(data => this.products = data)
+				.catch(err => console.log(err.message))
 	},
 	methods: {
-				getFeaturedProducts() {
-					return this.products.filter((product) => product.featured == true);
-				},
-				getCarouselProducts() {
-					return this.products.filter((product) => product.carousel == true);
-				}
+		getFeaturedProducts() {
+			return this.products.filter((product) => product.featured == true);
+		},
+		getCarouselProducts() {
+			return this.products.filter((product) => product.carousel == true);
+		}
 	}
 }
 </script>

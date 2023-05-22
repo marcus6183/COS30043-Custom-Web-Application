@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import Switches from '../views/Switches.vue'
 import ProductView from '../views/products/ProductView.vue'
 import ProductDetails from '../views/products/ProductDetails.vue'
+import Cart from '../views/Cart.vue'
 import NotFound from '../views/NotFound.vue'
 
 const routes = [
@@ -10,11 +10,6 @@ const routes = [
     path: '/',
     name: 'HomeView',
     component: HomeView
-  },
-  {
-    path: '/switches',
-    name: 'Switches',
-    component: Switches
   },
   {
     path: '/products',
@@ -26,6 +21,11 @@ const routes = [
     name: 'ProductDetails',
     component: ProductDetails,
     props: true // Accept route parameters as props
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: Cart
   },
   // Catch all 404
   {
