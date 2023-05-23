@@ -75,8 +75,8 @@
 
 <script>
 import CartItem from '@/components/CartItem.vue';
-import { onSnapshot, doc, setDoc, collection } from "firebase/firestore";
-import { db } from '@/firebase';
+// import { onSnapshot, doc, setDoc, collection } from "firebase/firestore";
+// import { db } from '@/firebase';
 
 export default {
     name: 'Cart',

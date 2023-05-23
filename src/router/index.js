@@ -1,11 +1,20 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { auth } from '@/firebase'
 import HomeView from '../views/HomeView.vue'
 import ProductView from '../views/products/ProductView.vue'
 import ProductDetails from '../views/products/ProductDetails.vue'
 import Cart from '../views/Cart.vue'
 import NotFound from '../views/NotFound.vue'
+import Login from '../views/Login.vue'
+import Account from '../views/Account.vue'
+
 
 const routes = [
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
   {
     path: '/',
     name: 'HomeView',
@@ -23,9 +32,20 @@ const routes = [
     props: true // Accept route parameters as props
   },
   {
+    path: '/account',
+    name: 'Account',
+    component: Account,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
     path: '/cart',
     name: 'Cart',
-    component: Cart
+    component: Cart,
+    meta: {
+      requiresAuth: true
+    }
   },
   // Catch all 404
   {
@@ -43,6 +63,20 @@ const router = createRouter({
     // always scroll to top
     return { top: 0 }
   }
+})
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login' && auth.currentUser) {
+    next('/')
+    return;
+  }
+
+  if (to.matched.some(record => record.meta.requiresAuth) && !auth.currentUser){
+    next('/login')
+    return;
+  }
+
+  next();
 })
 
 export default router

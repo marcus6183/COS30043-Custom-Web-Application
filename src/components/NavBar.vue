@@ -19,8 +19,16 @@
                     <li class="nav-item">
                         <router-link class="nav-link" :to="{ name: 'Cart' }">CART</router-link>
                     </li>
-                    <li class="nav-item">
-                        <router-link class="nav-link" :to="{ name: 'HomeView'}">LOGOUT</router-link>
+                    <li class="nav-item" v-if="$store.state.user">
+                        <router-link class="nav-link" :to="{ name: 'Account'}">ACCOUNT</router-link>
+                    </li>
+                    <li class="nav-item" v-if="$store.state.user">
+                        <div @click="$store.dispatch('logout')">
+                            <router-link class="nav-link" :to="{ name: 'HomeView'}">LOGOUT</router-link>
+                        </div>
+                    </li>
+                    <li class="nav-item" v-else>
+                        <router-link class="nav-link" :to="{ name: 'Login'}">LOGIN</router-link>
                     </li>
                 </ul>
             </div>
@@ -30,8 +38,19 @@
 </template>
 
 <script>
+import { onBeforeMount } from 'vue';
+import { useStore } from 'vuex'
+
 export default {
-    name: 'NavBar'
+    name: 'NavBar',
+
+    setup() {
+        const store = useStore()
+
+        onBeforeMount(() => {
+        store.dispatch('fetchUser')
+        })
+    }
 }
 </script>
 
