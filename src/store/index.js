@@ -44,6 +44,7 @@ const store = createStore({
 
             try {
                 await createUserWithEmailAndPassword(auth, email, password)
+                 //TODO: Create user account in user details page
             } catch (error) {
                 switch(error.code) {
                     case 'auth/email-already-in-use':

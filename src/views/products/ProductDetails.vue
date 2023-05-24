@@ -6,7 +6,7 @@
             </div>
             <div class="detailContainer col-lg-6 p-0">
                 <div class="upper col p-5 d-flex flex-column align-items-center">
-                    <h2><strong>[{{ stockStatus }}] {{ product.name }}</strong>></h2><br>
+                    <h2><strong>[{{ stockStatus }}] {{ product.name }}</strong></h2><br>
                     <h4>RM {{ product.price }}</h4>
                     <h5>Quantity</h5>
                     <div class="wrapper mb-3">
@@ -19,7 +19,7 @@
                 <div class="lower p-5">
                     <h3 class="descText">Description</h3>
                     <ul class="descList">
-                        <li v-for="description in descriptionArray">{{ description }}</li>
+                        <li v-for="description in product.description">{{ description }}</li>
                     </ul>              
                 </div>
             </div>
@@ -37,6 +37,11 @@
 
 <script>
 import ProductCard from '@/components/ProductCard.vue';
+import { 
+    onSnapshot, collection, // For data retrieval
+    doc, setDoc // For add to cart 
+} from "firebase/firestore";
+import { db } from '@/firebase';
 
 export default {
     name: 'ProductDetails',
@@ -47,45 +52,75 @@ export default {
     data() {
         return {
             product: Object,
-            descriptionArray: [],
             similarProducts: [],
             quantity: 1,
-            stockStatus: ''
+            stockStatus: '',
         }
     },
     mounted() {
         this.fetchProduct();
     },
     methods: {
-        fetchProduct() {
-            // Fetching the product data
-            fetch('http://localhost:3000/products')
-                .then(res => res.json())
-                .then(data => {
-                    // Filter data to get only the matching product id
-                    // Array.find() function is used here instead of filter so that it returns an object instead of an array
-                    this.product = data.find(product => product.id == this.id)
-                    this.product.price = this.product.price.toFixed(2)
-                    if(this.product.stock != 0){
-                        this.stockStatus = "In-Stock"
-                    }else{
-                        this.stockStatus = "Out-of-stock"
-                    }
-                    // Get array of similar products
-                    // Filter is used here to exclude the current product and get only products of the same category
-                    this.similarProducts = data.filter(product => product.id != this.id && product.category == this.product.category).slice(0, 4)
-                })
-                .catch(err => console.log(err.message))
+        // // Fetching the product data
+            // fetch('http://localhost:3000/products')
+            //     .then(res => res.json())
+            //     .then(data => {
+            //         // Filter data to get only the matching product id
+            //         // Array.find() function is used here instead of filter so that it returns an object instead of an array
+            //         this.product = data.find(product => product.id == this.id)
+            //         this.product.price = this.product.price.toFixed(2)
+            //         if(this.product.stock != 0){
+            //             this.stockStatus = "In-Stock"
+            //         }else{
+            //             this.stockStatus = "Out-of-stock"
+            //         }
+            //         // Get array of similar products
+            //         // Filter is used here to exclude the current product and get only products of the same category
+            //         this.similarProducts = data.filter(product => product.id != this.id && product.category == this.product.category).slice(0, 4)
+            //     })
+            //     .catch(err => console.log(err.message))
             
-            // Fetching the product descriptions
-            fetch('http://localhost:3000/productDescription')
-                .then(res => res.json())
-                .then(data => {
-                    // Filter data to get only the matching product id
-                    data = data.find(product => product.id == this.id)
-                    this.descriptionArray = data.description
+            // // Fetching the product descriptions
+            // fetch('http://localhost:3000/productDescription')
+            //     .then(res => res.json())
+            //     .then(data => {
+            //         // Filter data to get only the matching product id
+            //         data = data.find(product => product.id == this.id)
+            //         this.descriptionArray = data.description
+            //     })
+            //     .catch(err => console.log(err.message))
+        fetchProduct() {
+            onSnapshot(collection(db, 'products'), (querySnapshot) => {
+                const tempProducts = []
+                querySnapshot.forEach((doc) => {
+                    const product = {
+                        id: doc.id,
+                        name: doc.data().name,
+                        brand: doc.data().brand,
+                        imgURL: doc.data().imgURL,
+                        category: doc.data().category,
+                        price: doc.data().price,
+                        status: doc.data().status,
+                        stock: doc.data().stock,
+                        featured: doc.data().featured,
+                        carousel: doc.data().carousel,
+                        description: doc.data().description
+                    }
+                    tempProducts.push(product)
                 })
-                .catch(err => console.log(err.message))
+                this.filterProduct(tempProducts)
+            })
+        },
+        filterProduct(tempProducts){
+            // Finding product by id
+            this.product = tempProducts.find(product => product.id == this.id)
+            if(this.product.stock != 0){
+                this.stockStatus = "In-Stock"
+            }else{
+                this.stockStatus = "Out-of-stock"
+            }
+            // Get array of similar product
+            this.similarProducts = tempProducts.filter(product => product.id != this.id && product.category == this.product.category).slice(0, 4)
         },
         updateQty(num) {
             if(num == 1){

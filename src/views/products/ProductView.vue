@@ -55,6 +55,8 @@
 
 <script>
 import ProductCard from '@/components/ProductCard.vue';
+import { onSnapshot, collection } from "firebase/firestore";
+import { db } from '@/firebase';
 
 export default {
     name: 'ProductView',
@@ -70,10 +72,30 @@ export default {
         }
     },
     mounted() {
-        fetch('http://localhost:3000/products')
-            .then(res => res.json())
-            .then(data => this.products = data)
-            .catch(err => console.log(err.message))
+        onSnapshot(collection(db, 'products'), (querySnapshot) => {
+            const tempProducts = []
+            querySnapshot.forEach((doc) => {
+                const product = {
+                    id: doc.id,
+                    name: doc.data().name,
+                    brand: doc.data().brand,
+                    imgURL: doc.data().imgURL,
+                    category: doc.data().category,
+                    price: doc.data().price,
+                    status: doc.data().status,
+                    stock: doc.data().stock,
+                    featured: doc.data().featured,
+                    carousel: doc.data().carousel
+                }
+                tempProducts.push(product)
+            })
+            this.products = tempProducts
+        })
+        // JSON Server (OLD, to be removed)
+        // fetch('http://localhost:3000/products')
+        //     .then(res => res.json())
+        //     .then(data => this.products = data)
+        //     .catch(err => console.log(err.message))
     },
     computed:{
         filteredList:function(){
