@@ -1,45 +1,43 @@
 <template>
     <div class="container-fluid">
-        <div class="login">
-            <form class="loginForm" @submit.prevent="login">
-                <h2>Login</h2>
+        <div class="register">
+            <form class="registerForm" @submit.prevent="register">
+                <h2>Register</h2>
                 <div class="input-container mt-3 mb-4">
-                    <input id="email" type="email" class="text-input" autocomplete="on" placeholder="Email" v-model="login_form.email">
+                    <input id="email" type="email" class="text-input" autocomplete="on" placeholder="Email" v-model="register_form.email">
                     <label class="label" for="email">Email</label>
                 </div>
                 <div class="input-container">
-                    <input id="password" type="password" class="text-input" autocomplete="on" placeholder="Password" v-model="login_form.password">
+                    <input id="password" type="password" class="text-input" autocomplete="on" placeholder="Password" v-model="register_form.password">
                     <label class="label" for="password">Password</label>
                 </div>
-                <button class="loginBtn mt-4" type="submit">Login</button>
+                <button class="registerBtn mt-4" type="submit">Register</button>
                 <div class="registerText">
-                    <span>Don't have an account? Register <router-link class="link" :to="{ name: 'Register' }">here</router-link></span>
+                    <span>Already have an account? Login <router-link class="link" :to="{ name: 'Login' }">here</router-link></span>
                 </div>
             </form>
         </div>
+        
     </div>
-   
 </template>
 
 <script>
-// import { reactive, toRefs } from 'vue'
 import { ref } from 'vue'
 import { useStore } from 'vuex'
 
 export default {
+    name: 'Register',
     setup () {
-        const login_form = ref({});
-        // const register_form = ref({});
+        const register_form = ref({});
         const store = useStore();
 
-        const login = () => {
-            //TODO: Check empty on submit, if not empty, run->store.dispatch
-            store.dispatch('login', login_form.value);
+        const register = () => {
+            store.dispatch('register', register_form.value);
         }
 
         return {
-            login_form,
-            login,
+            register_form,
+            register
         }
     }
 }
@@ -63,7 +61,7 @@ h2 {
     align-items: center;
 }
 
-.login {
+.register {
     background: #fff;
     border-radius: 10px;
     height: 400px;
@@ -132,8 +130,8 @@ input:not(:placeholder-shown).text-input + .label{
     animation-delay: 0.2s;
 }
 
-/* Login button */
-.loginBtn {
+/* Register button */
+.registerBtn {
     background-color: var(--accentColor2);
     color: white;
     border: none;
@@ -143,7 +141,7 @@ input:not(:placeholder-shown).text-input + .label{
     transition: all 0.3s ease-in-out;
 }
 
-.loginBtn:hover {
+.registerBtn:hover {
     background-color: var(--accentColor1);
 }
 

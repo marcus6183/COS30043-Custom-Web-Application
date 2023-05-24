@@ -12,10 +12,9 @@
                         <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#filters-accordion">
                             <div class="row d-flex justify-content-between m-0 m-3">
                                 <div class="col-lg-3 p-0 m-0 mb-2">
-                                    <label for="searchInpput" class="form-label m-0">Search:</label>
+                                    <label for="searchInput" class="form-label m-0">Search:</label>
                                     <input class="form-control form-control-sm" name="searchInput" type="text" placeholder="Product name" aria-label="default input example" v-model="filters.searchInput">   
                                 </div>
-
                                 <div class="col-lg-3 p-0 m-0 mb-2">
                                     <label for="categorySelect" class="form-label m-0">Category:</label>
                                     <select class="form-select form-select-sm" name="categorySelect" aria-label="Default select example" v-model="filters.category">

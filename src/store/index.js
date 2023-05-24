@@ -21,13 +21,10 @@ const store = createStore({
 
             try {
                 await signInWithEmailAndPassword(auth, email, password)
-                // .then(cred => {
-                //     console.log("User ID is: " + cred.user.uid)
-                // })
             } catch (error) {
                 switch(error.code) {
                     case 'auth/user-not-found':
-                        alert("User not found")
+                        alert("Email not found")
                         break
                     case 'auth/wrong-password':
                         alert("Wrong password")
@@ -47,9 +44,6 @@ const store = createStore({
 
             try {
                 await createUserWithEmailAndPassword(auth, email, password)
-                // .then(cred => {
-                //     console.log("User ID is: " + cred.user.uid)
-                // })
             } catch (error) {
                 switch(error.code) {
                     case 'auth/email-already-in-use':
@@ -89,7 +83,7 @@ const store = createStore({
                 } else {
                     commit('SET_USER', user)
 
-                    if (router.isReady() && router.currentRoute.value.path === '/login') {
+                    if (router.isReady() && (router.currentRoute.value.path === '/login' || router.currentRoute.value.path === '/register')) {
                         router.push('/')
                     }
                 }

@@ -6,14 +6,19 @@ import ProductDetails from '../views/products/ProductDetails.vue'
 import Cart from '../views/Cart.vue'
 import NotFound from '../views/NotFound.vue'
 import Login from '../views/Login.vue'
+import Register from '../views/Register.vue'
 import Account from '../views/Account.vue'
-
 
 const routes = [
   {
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Register
   },
   {
     path: '/',
@@ -66,7 +71,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  if (to.path === '/login' && auth.currentUser) {
+  if ((to.path === '/login' || to.path === '/register') && auth.currentUser) {
     next('/')
     return;
   }
