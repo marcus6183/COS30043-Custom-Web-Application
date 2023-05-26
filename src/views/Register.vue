@@ -1,19 +1,45 @@
 <template>
-    <div class="container-fluid">
-        <div class="register">
-            <form class="registerForm" @submit.prevent="register">
-                <h2>Register</h2>
-                <div class="input-container mt-3 mb-4">
-                    <input id="email" type="email" class="text-input" autocomplete="on" placeholder="Email" v-model="register_form.email">
-                    <label class="label" for="email">Email</label>
-                </div>
-                <div class="input-container">
-                    <input id="password" type="password" class="text-input" autocomplete="on" placeholder="Password" v-model="register_form.password">
-                    <label class="label" for="password">Password</label>
-                </div>
-                <button class="registerBtn mt-4" type="submit">Register</button>
-                <div class="registerText">
-                    <span>Already have an account? Login <router-link class="link" :to="{ name: 'Login' }">here</router-link></span>
+    <div class="container-fluid row">
+        <div class="register col-8 col-sm-7 col-md-8 col-lg-7 col-xl-6 col-xxl-5">
+            <form class="registerForm" novalidate @submit.prevent="register">
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <h2>Register</h2>
+                    </div>
+                    <div class="first col-md-6">
+                        <div class="input-container mb-4">
+                            <input id="email" type="text" class="text-input" autocomplete="on" placeholder="Email" v-model="register_form.email">
+                            <label class="label" for="email">Email</label>
+                        </div>
+                        <div class="input-container mb-4">
+                            <input id="password" type="password" class="text-input" autocomplete="on" placeholder="Password" v-model="register_form.password">
+                            <label class="label" for="password">Password</label>
+                        </div>
+                        <div class="input-container mb-4">
+                            <input id="confirmPassword" type="password" class="text-input" autocomplete="off" placeholder="Confirm Password" v-model="register_form.confirmPassword">
+                            <label class="label" for="confirmPassword">Confirm Password</label>
+                        </div>
+                    </div>
+                    <div class="second col-md-6">
+                        <div class="input-container mb-4">
+                            <input id="name" type="text" class="text-input" autocomplete="on" placeholder="Name" v-model="register_form.name">
+                            <label class="label" for="name">Name</label>
+                        </div>
+                        <div class="input-container mb-4">
+                            <input id="contactNum" type="text" class="text-input" autocomplete="on" placeholder="Contact number" v-model="register_form.contactNum">
+                            <label class="label" for="contactNum">Contact number</label>
+                        </div>
+                        <div class="input-container addressCont mb-4">
+                            <textarea id="address" type="text" class="text-input" autocomplete="on" placeholder="Address" v-model="register_form.address"></textarea>
+                            <label class="label" for="address">Address</label>
+                        </div>
+                    </div>
+                    <div class="third col-12">
+                        <button class="registerBtn" type="submit">Register</button>
+                        <div class="loginText">
+                            <span>Don't have an account? Register <router-link class="link" :to="{ name: 'Register' }">here</router-link></span>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -64,15 +90,26 @@ h2 {
 .register {
     background: #fff;
     border-radius: 10px;
-    height: 400px;
-    width: 360px;
+    height: auto;
+    /* width: 80%; */
     padding: 20px 40px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+}
+
+.first, .second, .third {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /* Custom input field with label */
 /* Tutorial link: https://www.youtube.com/watch?v=7yXUfcujpsk */
 .input-container {
-    width: 280px;
+    width: 90%;
+    height: 50px;
     position: relative;
 }
 
@@ -112,7 +149,8 @@ h2 {
 }
 
 .text-input:focus + .label, 
-input:not(:placeholder-shown).text-input + .label{
+input:not(:placeholder-shown).text-input + .label,
+textarea:not(:placeholder-shown).text-input + .label{
     top: -20px;
     
     color: var(--accentColor1);
@@ -130,12 +168,17 @@ input:not(:placeholder-shown).text-input + .label{
     animation-delay: 0.2s;
 }
 
+/* Different height for address input field */
+.addressCont {
+    height: 100px;
+}
+
 /* Register button */
 .registerBtn {
     background-color: var(--accentColor2);
     color: white;
     border: none;
-    width: 280px;
+    width: 45%;
     height: 50px;
     border-radius: 5px;
     transition: all 0.3s ease-in-out;
@@ -146,8 +189,8 @@ input:not(:placeholder-shown).text-input + .label{
 }
 
 /* Register text */
-.registerText {
-    margin-top: 80px;
+.loginText {
+    margin-top: 20px;
     width: 100%;
  }
 

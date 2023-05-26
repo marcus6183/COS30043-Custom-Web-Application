@@ -4,7 +4,7 @@
             <div class="cart p-3">
                 <div class="d-flex justify-content-between align-items-center p-2">
                     <h3>Shopping Cart</h3>
-                    <h3>10 items</h3>
+                    <h3>3 items</h3>
                 </div>
                 <div class="table-responsive">
                     <table class="table">

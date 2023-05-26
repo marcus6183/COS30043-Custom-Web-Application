@@ -1,7 +1,7 @@
 <template>
     <div class="container-fluid">
         <div class="login">
-            <form class="loginForm" @submit.prevent="login">
+            <form class="loginForm" novalidate @submit.prevent="login">
                 <h2>Login</h2>
                 <div class="input-container mt-3 mb-4">
                     <input id="email" type="email" class="text-input" autocomplete="on" placeholder="Email" v-model="login_form.email">
@@ -69,6 +69,9 @@ h2 {
     height: 400px;
     width: 360px;
     padding: 20px 40px;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -webkit-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+    -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
 }
 
 /* Custom input field with label */
