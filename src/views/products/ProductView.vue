@@ -1,5 +1,10 @@
 <template>
-    <div class="container-fluid">
+    <div class="loading" v-if="isLoading">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+    <div :class="'container-fluid products ' + (isLoading ? '':'show')">
         <div class="row">
             <div id="filter-container">
                 <div class="accordion accordion-flush" id="filters-accordion">
@@ -68,7 +73,8 @@ export default {
             filters: {searchInput: '', category: 'All', sortByPrice: 'none'},
             products: [],
             productText: '',
-            resultsCount: 0
+            resultsCount: 0,
+            isLoading: true
         }
     },
     mounted() {
@@ -90,6 +96,7 @@ export default {
                 tempProducts.push(product)
             })
             this.products = tempProducts
+            this.isLoading = false
         })
         // JSON Server (OLD, to be removed)
         // fetch('http://localhost:3000/products')
@@ -137,6 +144,24 @@ export default {
 </script>
 
 <style scoped>
+/* Loading animation */
+.loading {
+	height: calc(100vh - 240px);
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.products {
+	min-height: 100vh;
+	opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+.show {
+	opacity: 1;
+}
+
 #products {
     padding: 10px;
     height: 100%;

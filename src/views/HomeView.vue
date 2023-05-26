@@ -1,5 +1,10 @@
 <template>
-	<div class="home">
+	<div class="loading" v-if="isLoading">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+	<div :class="'home ' + (isLoading ? '':'show')">
 		<Carousel :carouselProducts="getCarouselProducts()"/>
 		<div class="container">
 			<h1>Featured Products</h1>
@@ -27,6 +32,7 @@ export default {
 	data() {
 		return {
 			products: [],
+			isLoading: true
 		}
 	},
 	mounted() {
@@ -48,6 +54,7 @@ export default {
                 tempProducts.push(product)
             })
             this.products = tempProducts
+			this.isLoading = false
         })
 		// fetch('http://localhost:3000/products')
 		// 		.then(res => res.json())
@@ -66,8 +73,22 @@ export default {
 </script>
 
 <style scoped>
+/* Loading animation */
+.loading {
+	height: calc(100vh - 240px);
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 .home {
 	min-height: 100vh;
+	opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+.show {
+	opacity: 1;
 }
 
 .col-xl-3
