@@ -14,7 +14,7 @@
                         <input type="number" class="num" :placeholder="quantity" v-model="quantity">
                         <span type="button" class="plus" @click="updateQty(1)">+</span>
                     </div>
-                    <button class="addToCartBtn">Add to cart</button>
+                    <button class="addToCartBtn" @click="addToCart(product.id)">Add to cart</button>
                 </div>
                 <div class="lower p-5">
                     <h3 class="descText">Description</h3>
@@ -36,12 +36,15 @@
 </template>
 
 <script>
+import store from '@/store';
+import router from '@/router'
 import ProductCard from '@/components/ProductCard.vue';
 import { 
-    onSnapshot, collection, // For data retrieval
-    doc, setDoc // For add to cart 
+    onSnapshot, collection, doc, getDocs, addDoc, // For data retrieval
+    query, where, updateDoc, serverTimestamp // For add to cart
 } from "firebase/firestore";
 import { db } from '@/firebase';
+import Swal from 'sweetalert2';
 
 export default {
     name: 'ProductDetails',
@@ -132,6 +135,76 @@ export default {
                 // Check if quantity is already at 1
                 if(this.quantity > 1){
                     this.quantity--
+                }
+            }
+        },
+        async addToCart(prodId){
+            // Sweet Alert settings
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            // Check if user is logged in
+            if (!store.state.user){
+                // Redirects the user to the login page if they are not logged in
+                router.push("/login")
+            } else {
+                // Check if the user's cart already has the product added
+                const collectionPath = 'users/' + store.state.user.uid + '/cart'
+
+                // Query to find current product in firestore
+                const q = query(collection(db, collectionPath), where("prodId", "==", prodId));
+
+                // Run query
+                const querySnapshot = await getDocs(q);
+
+                // If the query result is empty -> add a new document in the cart collection
+                if(querySnapshot.empty){
+                    // add new document in the cart collection
+                    try {
+                        await addDoc(collection(db, collectionPath), {
+                            prodId: prodId,
+                            qty: this.quantity,
+                            dateAdded: serverTimestamp(),
+                            dateModified: serverTimestamp()
+                        })
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Product added to cart'
+                        })
+                    } catch (error) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Error adding product to cart. Please try again later'
+                        })
+                    }
+                    
+                // Else -> update the document in the cart collection
+                } else {
+                    const docObject = querySnapshot.docs[0] // Assuming that there is only 1 result from the query
+                    const docRef = doc(db, collectionPath, docObject.id)
+                    try {
+                        await updateDoc(docRef, {
+                            qty: Number(docObject.data().qty) + this.quantity,
+                            dateModified: serverTimestamp()
+                        })
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Product has been updated in cart'
+                        })
+                    } catch (error) {
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Error adding product to cart. Please try again later'
+                        })
+                    }
                 }
             }
         }

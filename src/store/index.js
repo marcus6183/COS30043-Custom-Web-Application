@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import router from '@/router'
 import { auth, db } from '@/firebase'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, doc, addDoc, setDoc } from 'firebase/firestore'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 import Swal from 'sweetalert2'
 
@@ -94,14 +94,14 @@ const store = createStore({
             }
 
             try {
-                await createUserWithEmailAndPassword(auth, email, password).then(async cred => {
-                    const docRef = await addDoc(collection(db, 'users'), {
-                        userID: cred.user.uid,
-                        name: name,
-                        contactNum: contactNum,
-                        address: address
+                await createUserWithEmailAndPassword(auth, email, password)
+                    .then(async cred => {
+                        await setDoc(doc(db, 'users', cred.user.uid), { // Passing cred.user.uid here to create a document in the "users" collection with a document ID equal to the user id in firebase authentication
+                            name: name,
+                            contactNum: contactNum,
+                            address: address
+                        })
                     })
-                })
                 //Create user account in firestore here
                 commit('SET_USER', auth.currentUser)
                 router.push('/')
@@ -120,6 +120,7 @@ const store = createStore({
                         Swal.fire({ title: 'Error', text: 'Weak password. Please choose another one', confirmButtonColor: '#00bf63' })
                         break
                     default:
+                        console.log(error)
                         Swal.fire({
                             title: 'Error',
                             text: 'There seems to be an error on our side. Sorry for the inconvenience',

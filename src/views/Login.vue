@@ -22,7 +22,6 @@
 </template>
 
 <script>
-// import { reactive, toRefs } from 'vue'
 import { ref } from 'vue'
 import { useStore } from 'vuex'
 
@@ -33,7 +32,6 @@ export default {
         const store = useStore();
 
         const login = () => {
-            //TODO: Check empty on submit, if not empty, run->store.dispatch
             store.dispatch('login', login_form.value);
         }
 

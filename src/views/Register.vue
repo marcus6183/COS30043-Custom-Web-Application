@@ -37,7 +37,7 @@
                     <div class="third col-12">
                         <button class="registerBtn" type="submit">Register</button>
                         <div class="loginText">
-                            <span>Don't have an account? Register <router-link class="link" :to="{ name: 'Register' }">here</router-link></span>
+                            <span>Already have an account? Login <router-link class="link" :to="{ name: 'Login' }">here</router-link></span>
                         </div>
                     </div>
                 </div>
