@@ -93,6 +93,8 @@ export default {
             //     })
             //     .catch(err => console.log(err.message))
         fetchProduct() {
+            // resets the quantity
+            this.quantity = 1
             onSnapshot(collection(db, 'products'), (querySnapshot) => {
                 const tempProducts = []
                 querySnapshot.forEach((doc) => {

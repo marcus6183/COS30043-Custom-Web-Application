@@ -4,7 +4,7 @@
             <div class="cart p-3">
                 <div class="d-flex justify-content-between align-items-center p-2">
                     <h3>Shopping Cart</h3>
-                    <h3>3 items</h3>
+                    <h3>{{ cartItems.length }} items</h3>
                 </div>
                 <div class="table-responsive">
                     <table class="table">
@@ -22,16 +22,16 @@
                             <tr v-for="item in cartItems">
                                 <td>
                                     <div class="imgCont">
-                                        <img :src="item.ImgURL">
+                                        <img :src="item.imgURL">
                                     </div>
                                 </td>
                                 <td>{{ item.name }}</td>
-                                <td>{{ item.price }}</td>
+                                <td>{{ item.price.toFixed(2) }}</td>
                                 <td>
                                     <div class="wrapper">
-                                        <span type="button" class="minus" @click="updateQty(item.id-1, -1)">-</span>
+                                        <span type="button" class="minus" @click="updateQty(item.id, item.quantity, item.stock, -1)">-</span>
                                         <input type="number" class="num" :placeholder="item.quantity" v-model="item.quantity">
-                                        <span type="button" class="plus" @click="updateQty(item.id-1, 1)">+</span>
+                                        <span type="button" class="plus" @click="updateQty(item.id, item.quantity, item.stock, 1)">+</span>
                                     </div>
                                 </td>
                                 <td>{{ (item.price * item.quantity).toFixed(2) }}</td>
@@ -53,30 +53,28 @@
                 </div>
                 <div class="items">
                     <span class="label">Items:</span>
-                    <span class="amount">RM10.00</span>
+                    <span class="amount">RM{{ getTotals }}</span>
                 </div>
                 <div class="shipping">
                     <span class="label">Shipping:</span>
-                    <span class="amount">RM5.00</span>
+                    <span class="amount">RM{{ shippingCost.toFixed(2) }}</span>
                 </div>
                 <hr class="divider">
                 <div class="totalAmount">
                     <span class="label">Total Amount:</span>
-                    <span class="amount">RM15.00</span>
+                    <span class="amount">RM {{ (Number(getTotals) + shippingCost).toFixed(2) }}</span>
                 </div>
                 <button class="placeOrderBtn" @click="populateFirestore">Place Order</button>
             </div>
         </div>
-        
-        
     </div>
-    
 </template>
 
 <script>
 import CartItem from '@/components/CartItem.vue';
-// import { onSnapshot, doc, setDoc, collection } from "firebase/firestore";
-// import { db } from '@/firebase';
+import store from '@/store';
+import { onSnapshot, doc, getDoc, setDoc, collection} from "firebase/firestore";
+import { db } from '@/firebase';
 
 export default {
     name: 'Cart',
@@ -86,41 +84,137 @@ export default {
     data() {
         return {
             products: [],
-            cartItems: [
-                { id: 1, name: 'Tangerine', price: 2.80, quantity: 10, ImgURL:  "https://zionstudios.ph/wp-content/uploads/2021/01/DSC04647-scaled.jpg", stock: 30},
-                { id: 2, name: 'Tangerine', price: 2.80, quantity: 20, ImgURL:  "https://zionstudios.ph/wp-content/uploads/2021/01/DSC04647-scaled.jpg", stock: 25},
-                { id: 3, name: 'Tangerine', price: 2.80, quantity: 30, ImgURL:  "https://www.ashkeebs.com/wp-content/uploads/2021/08/Zaku-Switch-Product-Image-2.jpg", stock: 35}
-            ]
+            cartEmpty: false,
+            cartItems: [],
+            shippingCost: 5
         }
     },
     mounted() {
+        onSnapshot(collection(db, 'users/' + store.state.user.uid + '/cart'), (querySnapshot) => {
+            const tempCart = [];
+
+            if (querySnapshot.empty) {
+                this.cartEmpty = true;
+                console.log("Cart is empty");
+            } else {
+                this.cartEmpty = false;
+
+                const promises = [];
+
+                querySnapshot.forEach((doc) => {
+                const promise = this.getProductDetails(doc.data().prodId)
+                    .then(tempObject => {
+                        tempObject.id = doc.id;
+                        tempObject.prodId = doc.data().prodId;
+                        tempObject.quantity = doc.data().qty;
+                        tempObject.dateAdded = doc.data().dateAdded;
+                        tempCart.push(tempObject);
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    });
+
+                promises.push(promise);
+                });
+
+                Promise.all(promises)
+                .then(() => {
+                    this.cartItems = tempCart;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+            }
+        });
         /* Active snapshot template */
-        // onSnapshot(collection(db, 'products'), (querySnapshot) => {
-        //     querySnapshot.forEach((doc) => {
-        //         console.log(doc.id + " => ", doc.data());
-        //     })
+        // onSnapshot(collection(db, 'users/' + store.state.user.uid + '/cart'), (querySnapshot) => {
+        //     const tempCart = []
+        //     if (querySnapshot.empty){
+        //         this.cartEmpty = true
+        //         console.log("Cart is empty")
+        //     }else{
+        //         this.cartEmpty = false
+        //         querySnapshot.forEach((doc) => {
+        //             this.getProductDetails(doc.data().prodId)
+        //                 .then(tempObject => {
+        //                     tempObject.id = doc.id,
+        //                     tempObject.prodId = doc.data().prodId,
+        //                     tempObject.quantity = doc.data().qty,
+        //                     tempObject.dateAdded = doc.data().dateAdded
+        //                     tempCart.push(tempObject)
+        //                     console.log(tempCart[0])
+        //                 })
+        //                 .catch(error => {
+        //                     console.log(error)
+        //                 })
+        //         })
+        //     }
         // })
-        fetch('http://localhost:3000/products')
-            .then(res => res.json())
-            .then(data => this.products = data)
-            .catch(err => console.log(err.message))
+
+        // onSnapshot(collection(db, 'products'), (querySnapshot) => {
+        //     const tempProducts = []
+        //     querySnapshot.forEach((doc) => {
+        //         const product = {
+        //             id: doc.id,
+        //             name: doc.data().name,
+        //             brand: doc.data().brand,
+        //             imgURL: doc.data().imgURL,
+        //             category: doc.data().category,
+        //             price: doc.data().price,
+        //             status: doc.data().status,
+        //             stock: doc.data().stock,
+        //             featured: doc.data().featured,
+        //             carousel: doc.data().carousel
+        //         }
+        //         tempProducts.push(product)
+        //     })
+        //     this.products = tempProducts
+        //     this.isLoading = false
+        // })
+        /* OLD TO BE REMOVED */
+        // fetch('http://localhost:3000/products')
+        //     .then(res => res.json())
+        //     .then(data => this.products = data)
+        //     .catch(err => console.log(err.message))
     },
     methods: {
+        async getProductDetails(prodId) {
+            // Fetch document in products collection by document product ID (also the document ID)
+            const docRef = doc(db, 'products', prodId)
+            const docSnap = await getDoc(docRef)
+            if(docSnap.exists()){
+                const productDetails = {
+                    name: docSnap.data().name,
+                    price: docSnap.data().price,
+                    imgURL: docSnap.data().imgURL,
+                    stock: docSnap.data().stock
+                }
+                return productDetails
+            }else{
+                console.log("Document with id of: " + prodId + "doesn't exists")
+                return false
+            }
+        },
         removeFromCart() {
+            //TODO
             console.log("Function is working")
         },
         updateQty(id, num) {
-            if(num == 1){
-                // Check if quantity is equal to stocks available
-                if(this.cartItems[id].quantity < this.cartItems[id].stock){
-                    this.cartItems[id].quantity++
-                }
-            }else if(num == -1){
-                // Check if quantity is already at 1
-                if(this.cartItems[id].quantity > 1){
-                    this.cartItems[id].quantity--
-                }
-            }
+            //TODO
+            console.log(this.cartItems[id])
+            // if(num == 1){
+            //     // Check if quantity is equal to stocks available
+            //     if(this.cartItems[id].quantity < this.cartItems[id].stock){
+            //         // Update the cart item in firebase
+            //         const cartRef = doc(db, 'users/' + store.state.user.uid + '/cart', id)
+            //         this.cartItems[id].quantity++
+            //     }
+            // }else if(num == -1){
+            //     // Check if quantity is already at 1
+            //     if(this.cartItems[id].quantity > 1){
+            //         this.cartItems[id].quantity--
+            //     }
+            // }
         },
         populateFirestore(){
             /* 
@@ -148,6 +242,15 @@ export default {
             //         });
             //     }
             // })
+        }
+    },
+    computed: {
+        getTotals() {
+            let total = 0
+            this.cartItems.forEach(item => {
+                total += item.price * item.quantity
+            })
+            return total.toFixed(2)
         }
     }
 }
