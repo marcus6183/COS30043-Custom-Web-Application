@@ -19,7 +19,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="item in cartItems">
+                            <tr v-for="(item, index) in cartItems" :key="index">
                                 <td>
                                     <div class="imgCont">
                                         <img :src="item.imgURL">
@@ -29,14 +29,14 @@
                                 <td>{{ item.price.toFixed(2) }}</td>
                                 <td>
                                     <div class="wrapper">
-                                        <span type="button" class="minus" @click="updateQty(item.id, item.quantity, item.stock, -1)">-</span>
+                                        <span type="button" class="minus" @click="updateQty(index, -1)">-</span>
                                         <input type="number" class="num" :placeholder="item.quantity" v-model="item.quantity">
-                                        <span type="button" class="plus" @click="updateQty(item.id, item.quantity, item.stock, 1)">+</span>
+                                        <span type="button" class="plus" @click="updateQty(index, 1)">+</span>
                                     </div>
                                 </td>
                                 <td>{{ (item.price * item.quantity).toFixed(2) }}</td>
                                 <td>
-                                    <button class="removeButton" @click="removeFromCart">
+                                    <button class="removeButton" @click="removeFromCart(item.id)">
                                         <img src="@/assets/icons/icons8-trash-24.png" alt="">
                                     </button>
                                 </td>
@@ -73,7 +73,7 @@
 <script>
 import CartItem from '@/components/CartItem.vue';
 import store from '@/store';
-import { onSnapshot, doc, getDoc, setDoc, collection} from "firebase/firestore";
+import { onSnapshot, doc, getDoc, deleteDoc, setDoc, updateDoc, collection} from "firebase/firestore";
 import { db } from '@/firebase';
 
 export default {
@@ -195,26 +195,38 @@ export default {
                 return false
             }
         },
-        removeFromCart() {
-            //TODO
-            console.log("Function is working")
+
+        async removeFromCart(id) {
+            try {
+                await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', id));
+                console.log("Item[id]: " + id + " removed from cart")
+            }catch(error){
+                console.log(error)
+            }
+        }, 
+
+        updateQty(index, num) {
+            if(num == 1){
+                // Check item quantity on current stock
+                if(this.cartItems[index].quantity < this.cartItems[index].stock){
+                    this.cartItems[index].quantity++
+                    this.updateQuantityInFirestore(this.cartItems[index].id, this.cartItems[index].quantity)
+                }
+            }else if (num == -1){
+                if(this.cartItems[index].quantity > 1){
+                    this.cartItems[index].quantity--
+                    this.updateQuantityInFirestore(this.cartItems[index].id, this.cartItems[index].quantity)
+                }
+            }
         },
-        updateQty(id, num) {
-            //TODO
-            console.log(this.cartItems[id])
-            // if(num == 1){
-            //     // Check if quantity is equal to stocks available
-            //     if(this.cartItems[id].quantity < this.cartItems[id].stock){
-            //         // Update the cart item in firebase
-            //         const cartRef = doc(db, 'users/' + store.state.user.uid + '/cart', id)
-            //         this.cartItems[id].quantity++
-            //     }
-            // }else if(num == -1){
-            //     // Check if quantity is already at 1
-            //     if(this.cartItems[id].quantity > 1){
-            //         this.cartItems[id].quantity--
-            //     }
-            // }
+
+        async updateQuantityInFirestore(id, qty) {
+            const cartRef = doc(db, 'users/' + store.state.user.uid + '/cart', id);
+            // Set the "capital" field of the city 'DC'
+            await updateDoc(cartRef, {
+                qty: qty
+            });
+            console.log("Update success!")
         },
         populateFirestore(){
             /* 
