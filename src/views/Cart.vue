@@ -50,7 +50,7 @@
                     <span class="label">Total Amount:</span>
                     <span class="amount">RM {{ (Number(getTotals) + shippingCost).toFixed(2) }}</span>
                 </div>
-                <button class="placeOrderBtn" @click="populateFirestore">Place Order</button>
+                <button class="placeOrderBtn" @click="placeOrder">Place Order</button>
             </div>
         </div>
     </div>
@@ -59,8 +59,9 @@
 <script>
 import CartItem from '@/components/CartItem.vue';
 import store from '@/store';
-import { onSnapshot, doc, getDoc, deleteDoc, setDoc, updateDoc, collection} from "firebase/firestore";
+import { onSnapshot, doc, getDoc, addDoc, deleteDoc, setDoc, updateDoc, collection, serverTimestamp} from "firebase/firestore";
 import { db } from '@/firebase';
+import Swal from 'sweetalert2'
 
 export default {
     name: 'Cart',
@@ -69,7 +70,6 @@ export default {
     },
     data() {
         return {
-            products: [],
             cartItems: [],
             shippingCost: 5,
             isLoading: true
@@ -133,6 +133,76 @@ export default {
                 return false
             }
         },
+        async placeOrder() {
+            // Sweet Alert settings
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            // Check if itemCart is empty
+            if(this.cartItems.length != 0){
+                const collectionPath = 'users/' + store.state.user.uid + '/orders'
+                const tempOrderedItems = []
+                // const totalAmount = this.getTotals
+                this.cartItems.forEach(item => {
+                    const tempObject = {
+                        prodId: item.prodId,
+                        qty: item.quantity
+                    }
+                    tempOrderedItems.push(tempObject)
+                })
+                console.log(tempOrderedItems)
+                try {
+                    await addDoc(collection(db, collectionPath), {
+                        orderDate: serverTimestamp(),
+                        status: "Unfulfilled",
+                        orderTotal: +this.getTotals,
+                        orderItems: tempOrderedItems
+                    })
+                    this.updateStocks()
+                    this.clearCart()
+                    
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Order placed successfully'
+                    })
+                } catch (error) {
+                    console.log(error)
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Error adding placing order. Please try again later'
+                    })
+                }
+            }else{
+                console.log("Cart is empty")
+            }
+        },
+        updateStocks() {
+            this.cartItems.forEach(async item => {
+                const productRef = doc(db, 'products', item.prodId)
+                await updateDoc(productRef, {
+                    stock: Number(item.stock - item.quantity)
+                })
+            })
+        },
+        clearCart() {
+            this.cartItems.forEach(async item => {
+                try {
+                    await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', item.id));
+                    console.log("Item[id]: " + item.id + " removed from cart")
+                }catch(error){
+                    console.log(error)
+                }
+            })
+            this.cartItems = []
+        }
     },
     computed: {
         getTotals() {
@@ -187,67 +257,6 @@ th {
     text-align: start;
     vertical-align: middle;
 }
-
-/* .imgCont {
-    width: 100px;
-    height: 100px;
-    background-color: #fff;
-    border: 1px solid grey;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
-
-.imgCont img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    margin-right: 20px;
-}
-
-.wrapper {
-    height: fit-content;
-    width: fit-content;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    border-radius: 5px;
-    border: 1px solid var(--accentColor1);
-} 
-.wrapper span {
-    width: 25px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-}
-.num::-webkit-inner-spin-button, 
-.num::-webkit-outer-spin-button { 
-  -webkit-appearance: none; 
-  margin: 0; 
-}
-.num {
-    border: none;
-    text-align: center;
-    width: 30px;
-    font-size: 16px;
-    border-right: 2px solid rgba(0,0,0,0.2);
-    border-left: 2px solid rgba(0,0,0,0.2);
-}
-.num:focus {
-    outline:none;
-} */
-
-/* .removeButton {
-    background: transparent;
-    border: none;
-    padding: 0px;
-    cursor: pointer;
-}
-
-.removeButton:hover img {
-    content: url("@/assets/icons/icons8-trash-24-hover.png");
-} */
 
 /* Totals container */
 .items, .shipping, .totalAmount {
