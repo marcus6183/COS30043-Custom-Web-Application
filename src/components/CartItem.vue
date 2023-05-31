@@ -26,7 +26,7 @@ import { doc, updateDoc, deleteDoc } from "firebase/firestore"
 import { db } from "@/firebase"
 import store from "@/store"
 import debounce from 'lodash/debounce'
-import Swal from 'sweetalert2';
+import Swal from 'sweetalert2'
 
 export default {
     name: 'CartItem',
@@ -66,7 +66,7 @@ export default {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
-                        await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id));
+                        await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id))
                         console.log("Item[id]: " + this.itemObject.id + " removed from cart")
                         Swal.fire({
                             text: '\"' + this.itemObject.name + '\" has been removed from cart',
@@ -76,7 +76,6 @@ export default {
                     }catch(error){
                         console.log(error)
                     }
-                    
                 }
             })
             
@@ -85,17 +84,17 @@ export default {
         async updateQuantityInFirestore() {
             // Checks the quantity, only proceed when the quantity is not 0 (possible when manually changing the input)
             if(this.itemObject.quantity != 0){
-                const cartRef = doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id);
+                const cartRef = doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id)
                 await updateDoc(cartRef, {
                     qty: this.itemObject.quantity
-                });
+                })
                 console.log("Update success!")
             }
         }
     },
     // Debounce from Lodash library, to minimize API call/update to firestore
     created() {
-        this.debouncedUpdateQuantityInFirestore = debounce(this.updateQuantityInFirestore, 1000);
+        this.debouncedUpdateQuantityInFirestore = debounce(this.updateQuantityInFirestore, 1000)
     },
 }
 </script>

@@ -24,7 +24,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(item, index) in cartItems" :key="index">
+                            <tr v-if="!isCartEmpty" v-for="(item, index) in cartItems" :key="index">
                                 <CartItem :itemObject="item"></cartitem>
                             </tr>
                         </tbody>
@@ -50,17 +50,17 @@
                     <span class="label">Total Amount:</span>
                     <span class="amount">RM {{ (Number(getTotals) + shippingCost).toFixed(2) }}</span>
                 </div>
-                <button class="placeOrderBtn" @click="placeOrder">Place Order</button>
+                <button :disabled="isCartEmpty" class="placeOrderBtn" @click="placeOrder">Place Order</button>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import CartItem from '@/components/CartItem.vue';
-import store from '@/store';
-import { onSnapshot, doc, getDoc, addDoc, deleteDoc, setDoc, updateDoc, collection, serverTimestamp} from "firebase/firestore";
-import { db } from '@/firebase';
+import CartItem from '@/components/CartItem.vue'
+import store from '@/store'
+import { onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, collection, serverTimestamp} from "firebase/firestore"
+import { db } from '@/firebase'
 import Swal from 'sweetalert2'
 
 export default {
@@ -77,43 +77,41 @@ export default {
     },
     mounted() {
         onSnapshot(collection(db, 'users/' + store.state.user.uid + '/cart'), (querySnapshot) => {
-            const tempCart = [];
+            const tempCart = []
 
             if (querySnapshot.empty) {
-                this.cartItems = [];
-                this.isLoading = false;
-                console.log("Cart is empty");
+                this.cartItems = []
+                this.isLoading = false
+                console.log("Cart is empty")
             } else {
-                this.cartEmpty = false;
-
-                const promises = [];
+                const promises = []
 
                 querySnapshot.forEach((doc) => {
                 const promise = this.getProductDetails(doc.data().prodId)
                     .then(tempObject => {
-                        tempObject.id = doc.id;
-                        tempObject.prodId = doc.data().prodId;
-                        tempObject.quantity = doc.data().qty;
-                        tempObject.dateAdded = doc.data().dateAdded;
-                        tempCart.push(tempObject);
+                        tempObject.id = doc.id
+                        tempObject.prodId = doc.data().prodId
+                        tempObject.quantity = doc.data().qty
+                        tempObject.dateAdded = doc.data().dateAdded
+                        tempCart.push(tempObject)
                     })
                     .catch(error => {
-                        console.log(error);
-                    });
+                        console.log(error)
+                    })
 
-                promises.push(promise);
-                });
+                promises.push(promise)
+                })
 
                 Promise.all(promises)
                 .then(() => {
-                    this.cartItems = tempCart;
+                    this.cartItems = tempCart
                     this.isLoading = false
                 })
                 .catch(error => {
-                    console.log(error);
-                });
+                    console.log(error)
+                })
             }
-        });
+        })
     },
     methods: {
         async getProductDetails(prodId) {
@@ -150,25 +148,28 @@ export default {
             if(this.cartItems.length != 0){
                 const collectionPath = 'users/' + store.state.user.uid + '/orders'
                 const tempOrderedItems = []
-                // const totalAmount = this.getTotals
+
                 this.cartItems.forEach(item => {
                     const tempObject = {
                         prodId: item.prodId,
+                        name: item.name,
+                        imgURL: item.imgURL,
+                        price: item.price,
                         qty: item.quantity
                     }
                     tempOrderedItems.push(tempObject)
                 })
-                console.log(tempOrderedItems)
+
                 try {
                     await addDoc(collection(db, collectionPath), {
                         orderDate: serverTimestamp(),
                         status: "Unfulfilled",
-                        orderTotal: +this.getTotals,
+                        orderTotal: +(this.getTotals + this.shippingCost),
                         orderItems: tempOrderedItems
                     })
                     this.updateStocks()
                     this.clearCart()
-                    
+
                     Toast.fire({
                         icon: 'success',
                         title: 'Order placed successfully'
@@ -187,9 +188,13 @@ export default {
         updateStocks() {
             this.cartItems.forEach(async item => {
                 const productRef = doc(db, 'products', item.prodId)
-                await updateDoc(productRef, {
-                    stock: Number(item.stock - item.quantity)
-                })
+                try {
+                    await updateDoc(productRef, {
+                        stock: Number(item.stock - item.quantity)
+                    })
+                }catch(error){
+                    console.log(error)
+                }
             })
         },
         clearCart() {
@@ -201,7 +206,6 @@ export default {
                     console.log(error)
                 }
             })
-            this.cartItems = []
         }
     },
     computed: {
@@ -211,6 +215,9 @@ export default {
                 total += item.price * item.quantity
             })
             return total.toFixed(2)
+        },
+        isCartEmpty() {
+            return this.cartItems.length === 0
         }
     }
 }
@@ -249,16 +256,16 @@ export default {
     -moz-box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
 }
 
-.totals h3 {
-    border-bottom: 3px solid var(--accentColor1);
-}
-
 th {
     text-align: start;
     vertical-align: middle;
 }
 
 /* Totals container */
+.totals h3 {
+    border-bottom: 3px solid var(--accentColor1);
+}
+
 .items, .shipping, .totalAmount {
     display: flex;
     justify-content: space-between;
@@ -272,6 +279,7 @@ th {
 .amount {
     color: var(--accentColor2);
 }
+
 .divider {
   border-top: 2px solid var(--accentColor1);
   margin: 10px 0;
@@ -290,5 +298,9 @@ th {
 
 .placeOrderBtn:hover {
     background-color: var(--accentColor1);
+}
+
+.placeOrderBtn:disabled {
+    background-color: #a8a8a8;
 }
 </style>
