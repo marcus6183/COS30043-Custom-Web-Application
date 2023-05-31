@@ -1,5 +1,10 @@
 <template>
-    <div class="container-fluid">
+    <div class="loading" v-if="isLoading">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+    <div :class="'container-fluid ' + (isLoading ? '':'show')">
         <div class="row m-2 d-flex justify-content-between">
             <div class="imageContainer col-lg-6 p-0">
                 <img :src="product.imgURL" alt="">
@@ -58,6 +63,7 @@ export default {
             similarProducts: [],
             quantity: 1,
             stockStatus: '',
+            isLoading: true
         }
     },
     mounted() {
@@ -126,6 +132,7 @@ export default {
             }
             // Get array of similar product
             this.similarProducts = tempProducts.filter(product => product.id != this.id && product.category == this.product.category).slice(0, 4)
+            this.isLoading = false
         },
         updateQty(num) {
             if(num == 1){
@@ -222,6 +229,12 @@ export default {
 <style scoped>
 .container-fluid {
     min-height: 100vh;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.show {
+    opacity: 1;
 }
 
 /* Image */
