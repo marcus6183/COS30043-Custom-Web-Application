@@ -1,5 +1,10 @@
 <template>
-    <div class="container-fluid row">
+    <div class="loading" v-if="isLoading">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+    <div :class="'container-fluid row ' + (isLoading ? '':'show')">
         <div class="left col-lg-9 col-md-8 p-3">
             <div class="cart p-3">
                 <div class="d-flex justify-content-between align-items-center p-2">
@@ -20,26 +25,7 @@
                         </thead>
                         <tbody>
                             <tr v-for="(item, index) in cartItems" :key="index">
-                                <td>
-                                    <div class="imgCont">
-                                        <img :src="item.imgURL">
-                                    </div>
-                                </td>
-                                <td>{{ item.name }}</td>
-                                <td>{{ item.price.toFixed(2) }}</td>
-                                <td>
-                                    <div class="wrapper">
-                                        <span type="button" class="minus" @click="updateQty(index, -1)">-</span>
-                                        <input type="number" class="num" :placeholder="item.quantity" v-model="item.quantity">
-                                        <span type="button" class="plus" @click="updateQty(index, 1)">+</span>
-                                    </div>
-                                </td>
-                                <td>{{ (item.price * item.quantity).toFixed(2) }}</td>
-                                <td>
-                                    <button class="removeButton" @click="removeFromCart(item.id)">
-                                        <img src="@/assets/icons/icons8-trash-24.png" alt="">
-                                    </button>
-                                </td>
+                                <CartItem :itemObject="item"></cartitem>
                             </tr>
                         </tbody>
                     </table>
@@ -84,9 +70,9 @@ export default {
     data() {
         return {
             products: [],
-            cartEmpty: false,
             cartItems: [],
-            shippingCost: 5
+            shippingCost: 5,
+            isLoading: true
         }
     },
     mounted() {
@@ -94,7 +80,8 @@ export default {
             const tempCart = [];
 
             if (querySnapshot.empty) {
-                this.cartEmpty = true;
+                this.cartItems = [];
+                this.isLoading = false;
                 console.log("Cart is empty");
             } else {
                 this.cartEmpty = false;
@@ -120,62 +107,13 @@ export default {
                 Promise.all(promises)
                 .then(() => {
                     this.cartItems = tempCart;
+                    this.isLoading = false
                 })
                 .catch(error => {
                     console.log(error);
                 });
             }
         });
-        /* Active snapshot template */
-        // onSnapshot(collection(db, 'users/' + store.state.user.uid + '/cart'), (querySnapshot) => {
-        //     const tempCart = []
-        //     if (querySnapshot.empty){
-        //         this.cartEmpty = true
-        //         console.log("Cart is empty")
-        //     }else{
-        //         this.cartEmpty = false
-        //         querySnapshot.forEach((doc) => {
-        //             this.getProductDetails(doc.data().prodId)
-        //                 .then(tempObject => {
-        //                     tempObject.id = doc.id,
-        //                     tempObject.prodId = doc.data().prodId,
-        //                     tempObject.quantity = doc.data().qty,
-        //                     tempObject.dateAdded = doc.data().dateAdded
-        //                     tempCart.push(tempObject)
-        //                     console.log(tempCart[0])
-        //                 })
-        //                 .catch(error => {
-        //                     console.log(error)
-        //                 })
-        //         })
-        //     }
-        // })
-
-        // onSnapshot(collection(db, 'products'), (querySnapshot) => {
-        //     const tempProducts = []
-        //     querySnapshot.forEach((doc) => {
-        //         const product = {
-        //             id: doc.id,
-        //             name: doc.data().name,
-        //             brand: doc.data().brand,
-        //             imgURL: doc.data().imgURL,
-        //             category: doc.data().category,
-        //             price: doc.data().price,
-        //             status: doc.data().status,
-        //             stock: doc.data().stock,
-        //             featured: doc.data().featured,
-        //             carousel: doc.data().carousel
-        //         }
-        //         tempProducts.push(product)
-        //     })
-        //     this.products = tempProducts
-        //     this.isLoading = false
-        // })
-        /* OLD TO BE REMOVED */
-        // fetch('http://localhost:3000/products')
-        //     .then(res => res.json())
-        //     .then(data => this.products = data)
-        //     .catch(err => console.log(err.message))
     },
     methods: {
         async getProductDetails(prodId) {
@@ -195,66 +133,6 @@ export default {
                 return false
             }
         },
-
-        async removeFromCart(id) {
-            try {
-                await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', id));
-                console.log("Item[id]: " + id + " removed from cart")
-            }catch(error){
-                console.log(error)
-            }
-        }, 
-
-        updateQty(index, num) {
-            if(num == 1){
-                // Check item quantity on current stock
-                if(this.cartItems[index].quantity < this.cartItems[index].stock){
-                    this.cartItems[index].quantity++
-                    this.updateQuantityInFirestore(this.cartItems[index].id, this.cartItems[index].quantity)
-                }
-            }else if (num == -1){
-                if(this.cartItems[index].quantity > 1){
-                    this.cartItems[index].quantity--
-                    this.updateQuantityInFirestore(this.cartItems[index].id, this.cartItems[index].quantity)
-                }
-            }
-        },
-
-        async updateQuantityInFirestore(id, qty) {
-            const cartRef = doc(db, 'users/' + store.state.user.uid + '/cart', id);
-            // Set the "capital" field of the city 'DC'
-            await updateDoc(cartRef, {
-                qty: qty
-            });
-            console.log("Update success!")
-        },
-        populateFirestore(){
-            /* 
-                Add document with doc id template
-                await setDoc(doc(db, "products", product.id.toString()), {          //Id must be sent as a string, int or number will cause error
-                    fieldName: value
-                }) 
-            */
-            /*
-                Populating products
-            */
-            // this.products.forEach(async product => {
-            //     if(product.id != 1){
-            //         // Add a new document in collection "products"
-            //         await setDoc(doc(db, "products", product.id.toString()), {
-            //             name: product.name,
-            //             brand: product.brand,
-            //             imgURL: product.imgURL,
-            //             category: product.category,
-            //             price: product.price,
-            //             status: product.status,
-            //             stock: product.stock,
-            //             featured: product.featured,
-            //             carousel: product.carousel
-            //         });
-            //     }
-            // })
-        }
     },
     computed: {
         getTotals() {
@@ -274,8 +152,22 @@ export default {
     padding: 0;
 }
 
+.loading {
+	height: calc(100vh - 240px);
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
 .container-fluid {
     min-height: 100vh;
+    opacity: 0;
+	transition: opacity 0.5s ease;
+}
+
+.show {
+    opacity: 1;
 }
 
 .cart, .totals {
@@ -291,12 +183,12 @@ export default {
     border-bottom: 3px solid var(--accentColor1);
 }
 
-th, td {
+th {
     text-align: start;
     vertical-align: middle;
 }
 
-.imgCont {
+/* .imgCont {
     width: 100px;
     height: 100px;
     background-color: #fff;
@@ -344,9 +236,9 @@ th, td {
 }
 .num:focus {
     outline:none;
-}
+} */
 
-.removeButton {
+/* .removeButton {
     background: transparent;
     border: none;
     padding: 0px;
@@ -355,7 +247,7 @@ th, td {
 
 .removeButton:hover img {
     content: url("@/assets/icons/icons8-trash-24-hover.png");
-}
+} */
 
 /* Totals container */
 .items, .shipping, .totalAmount {
