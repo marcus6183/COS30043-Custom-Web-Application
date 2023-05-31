@@ -14,7 +14,7 @@
         </div>
     </td>
     <td class="price">{{ (itemObject.price * itemObject.quantity).toFixed(2) }}</td>
-    <td>
+    <td class="remove">
         <button class="removeButton" @click="removeFromCart()">
             <img src="@/assets/icons/icons8-trash-24.png" alt="">
         </button>
@@ -26,6 +26,7 @@ import { doc, updateDoc, deleteDoc } from "firebase/firestore"
 import { db } from "@/firebase"
 import store from "@/store"
 import debounce from 'lodash/debounce'
+import Swal from 'sweetalert2';
 
 export default {
     name: 'CartItem',
@@ -51,16 +52,38 @@ export default {
                 }
             }
         },
+        // Removes the cart item in firestore
         async removeFromCart() {
-            // Can implement confirmation here
-            try {
-                await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id));
-                console.log("Item[id]: " + this.itemObject.id + " removed from cart")
-            }catch(error){
-                console.log(error)
-            }
+            // Confirmation dialouge
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Remove \"' + this.itemObject.name + '\" from cart?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#00bf63',
+                cancelButtonColor: '#ff914d',
+                confirmButtonText: 'Confirm'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id));
+                        console.log("Item[id]: " + this.itemObject.id + " removed from cart")
+                        Swal.fire({
+                            text: '\"' + this.itemObject.name + '\" has been removed from cart',
+                            icon: 'success',
+                            confirmButtonColor: '#00bf63'
+                        })
+                    }catch(error){
+                        console.log(error)
+                    }
+                    
+                }
+            })
+            
         },
+        // Updates the quantity of cart item in firestore
         async updateQuantityInFirestore() {
+            // Checks the quantity, only proceed when the quantity is not 0 (possible when manually changing the input)
             if(this.itemObject.quantity != 0){
                 const cartRef = doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id);
                 await updateDoc(cartRef, {
@@ -70,6 +93,7 @@ export default {
             }
         }
     },
+    // Debounce from Lodash library, to minimize API call/update to firestore
     created() {
         this.debouncedUpdateQuantityInFirestore = debounce(this.updateQuantityInFirestore, 1000);
     },
@@ -77,6 +101,7 @@ export default {
 </script>
 
 <style scoped>
+/* positioning of table data (td)*/
 td {
     text-align: start;
     vertical-align: middle;
@@ -84,6 +109,11 @@ td {
 .price {
     text-align: end;
 }
+.remove {
+    text-align: center;
+}
+
+/* Image */
 .imgCont {
     width: 100px;
     height: 100px;
@@ -101,6 +131,7 @@ td {
     margin-right: 20px;
 }
 
+/* Quantity +- button */
 .wrapper {
     height: fit-content;
     width: fit-content;
@@ -134,6 +165,7 @@ td {
     outline:none;
 }
 
+/* Remove button (trash icon) */
 .removeButton {
     background: transparent;
     border: none;
