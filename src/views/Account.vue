@@ -55,16 +55,18 @@ export default {
         return {
             isLoading: true,
             userDetails: Object,
-            orders: []
+            orders: [],
+            ssListener: null
         }
     },
     mounted() {
         this.getUserDetails()
         console.log('UID is: ' + store.state.user.uid)
-        onSnapshot(collection(db, 'users/' + store.state.user.uid + '/orders'), (querySnapshot) => {
+        this.ssListener = onSnapshot(collection(db, 'users/' + store.state.user.uid + '/orders'), (querySnapshot) => {
             const tempOrders = []
             if (querySnapshot.empty) {
                 this.isLoading = false
+                this.orders = []
                 console.log("Orders is empty")
             } else {
                 querySnapshot.forEach((doc) => {
@@ -97,6 +99,11 @@ export default {
         editProfile() {
             //TOBEIMPLEMENTED
         }
+    },
+    beforeRouteLeave(to, from, next) {
+        // Unsubscribe from the listener before leaving the component
+        this.ssListener();
+        next();
     }
 }
 </script>

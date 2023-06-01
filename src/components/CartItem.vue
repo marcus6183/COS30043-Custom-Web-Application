@@ -66,10 +66,12 @@ export default {
             }).then(async (result) => {
                 if (result.isConfirmed) {
                     try {
+                        const tempProdName = this.itemObject.name
+                        const tempProdId = this.itemObject.id
                         await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', this.itemObject.id))
-                        console.log("Item[id]: " + this.itemObject.id + " removed from cart")
+                        console.log("Item[id]: " + tempProdId + " removed from cart")
                         Swal.fire({
-                            text: '\"' + this.itemObject.name + '\" has been removed from cart',
+                            text: '\"' + tempProdName + '\" has been removed from cart',
                             icon: 'success',
                             confirmButtonColor: '#00bf63'
                         })

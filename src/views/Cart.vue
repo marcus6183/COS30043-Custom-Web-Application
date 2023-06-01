@@ -4,7 +4,7 @@
 			<span class="visually-hidden">Loading...</span>
 		</div>
 	</div>
-    <div :class="'container-fluid row ' + (isLoading ? '':'show')">
+    <div v-else :class="'container-fluid row ' + (isLoading ? '':'show')">
         <div class="left col-lg-9 col-md-8 p-3">
             <div class="cart p-3">
                 <div class="d-flex justify-content-between align-items-center p-2">
@@ -24,7 +24,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-if="!isCartEmpty" v-for="(item, index) in cartItems" :key="index">
+                            <tr v-for="(item, index) in cartItems" :key="index">
                                 <CartItem :itemObject="item"></cartitem>
                             </tr>
                         </tbody>
@@ -59,7 +59,16 @@
 <script>
 import CartItem from '@/components/CartItem.vue'
 import store from '@/store'
-import { onSnapshot, doc, getDoc, addDoc, deleteDoc, updateDoc, collection, serverTimestamp} from "firebase/firestore"
+import { 
+    onSnapshot,
+    doc,
+    getDoc,
+    addDoc,
+    deleteDoc,
+    updateDoc,
+    collection,
+    serverTimestamp
+} from "firebase/firestore"
 import { db } from '@/firebase'
 import Swal from 'sweetalert2'
 
@@ -72,48 +81,51 @@ export default {
         return {
             cartItems: [],
             shippingCost: 5,
-            isLoading: true
+            isLoading: true,
+            ssListener: null
         }
     },
     mounted() {
-        onSnapshot(collection(db, 'users/' + store.state.user.uid + '/cart'), (querySnapshot) => {
-            const tempCart = []
+        // Calls snapshotListener to subscribe to the listener
+        this.snapshotListener()  
+    },
+    methods: {
+        snapshotListener() {
+            this.ssListener = onSnapshot(collection(db, 'users/' + store.state.user.uid + '/cart'), (querySnapshot) => {
+                const tempCart = []
+                if (querySnapshot.empty) {
+                    this.cartItems = []
+                    this.isLoading = false
+                } else {
+                    const promises = []
 
-            if (querySnapshot.empty) {
-                this.cartItems = []
-                this.isLoading = false
-                console.log("Cart is empty")
-            } else {
-                const promises = []
+                    querySnapshot.forEach((doc) => {
+                    const promise = this.getProductDetails(doc.data().prodId)
+                        .then(tempObject => {
+                            tempObject.id = doc.id
+                            tempObject.prodId = doc.data().prodId
+                            tempObject.quantity = doc.data().qty
+                            tempObject.dateAdded = doc.data().dateAdded
+                            tempCart.push(tempObject)
+                        })
+                        .catch(error => {
+                            console.log(error)
+                        })
 
-                querySnapshot.forEach((doc) => {
-                const promise = this.getProductDetails(doc.data().prodId)
-                    .then(tempObject => {
-                        tempObject.id = doc.id
-                        tempObject.prodId = doc.data().prodId
-                        tempObject.quantity = doc.data().qty
-                        tempObject.dateAdded = doc.data().dateAdded
-                        tempCart.push(tempObject)
+                    promises.push(promise)
+                    })
+
+                    Promise.all(promises)
+                    .then(() => {
+                        this.cartItems = tempCart
+                        this.isLoading = false
                     })
                     .catch(error => {
                         console.log(error)
                     })
-
-                promises.push(promise)
-                })
-
-                Promise.all(promises)
-                .then(() => {
-                    this.cartItems = tempCart
-                    this.isLoading = false
-                })
-                .catch(error => {
-                    console.log(error)
-                })
-            }
-        })
-    },
-    methods: {
+                }
+            })
+        },
         async getProductDetails(prodId) {
             // Fetch document in products collection by document product ID (also the document ID)
             const docRef = doc(db, 'products', prodId)
@@ -127,11 +139,17 @@ export default {
                 }
                 return productDetails
             }else{
-                console.log("Document with id of: " + prodId + "doesn't exists")
+                console.log("Document with id of: " + prodId + "doesn't exists; from: getProductDetails()")
                 return false
             }
         },
         async placeOrder() {
+            // Set loading animation while processing the order
+            this.isLoading = true
+
+            // Unsubscribe from snapshotListener
+            this.ssListener()
+
             // Sweet Alert settings
             const Toast = Swal.mixin({
                 toast: true,
@@ -144,11 +162,13 @@ export default {
                     toast.addEventListener('mouseleave', Swal.resumeTimer)
                 }
             })
+
             // Check if itemCart is empty
             if(this.cartItems.length != 0){
                 const collectionPath = 'users/' + store.state.user.uid + '/orders'
                 const tempOrderedItems = []
 
+                // Populate cart items into tempOrderedItems, keeping only wanted attributes
                 this.cartItems.forEach(item => {
                     const tempObject = {
                         prodId: item.prodId,
@@ -160,6 +180,7 @@ export default {
                     tempOrderedItems.push(tempObject)
                 })
 
+                // Add order data to orders collection
                 try {
                     await addDoc(collection(db, collectionPath), {
                         orderDate: serverTimestamp(),
@@ -167,9 +188,14 @@ export default {
                         orderTotal: +(this.getTotals + this.shippingCost),
                         orderItems: tempOrderedItems
                     })
+                    // Calls updateStocks() and clearCart() once orders has been added
                     this.updateStocks()
                     this.clearCart()
 
+                    // Subscribe back to snapshotListener
+                    this.snapshotListener()
+
+                    // Show notification that order has been placed
                     Toast.fire({
                         icon: 'success',
                         title: 'Order placed successfully'
@@ -182,33 +208,40 @@ export default {
                     })
                 }
             }else{
-                console.log("Cart is empty")
+                console.log("Cart is empty; from: placeOrder()")
             }
         },
-        updateStocks() {
-            this.cartItems.forEach(async item => {
-                const productRef = doc(db, 'products', item.prodId)
+
+        // Function that updates the stock for each affected product
+        async updateStocks() {
+            for (const item of this.cartItems) {
+                const productRef = doc(db, 'products', item.prodId);
                 try {
                     await updateDoc(productRef, {
-                        stock: Number(item.stock - item.quantity)
-                    })
-                }catch(error){
-                    console.log(error)
+                        stock: Number(item.stock - item.quantity),
+                    });
+                    console.log("Stocks for product: " + item.prodId + " have been updated");
+                } catch (error) {
+                    console.log(error);
                 }
-            })
+            }
         },
-        clearCart() {
-            this.cartItems.forEach(async item => {
+
+        // Function that clears the cart collection
+        // Since deleting a whole collection is not recommended by firestore, will use loop to delete each document instead
+        async clearCart() {
+            for (const item of this.cartItems) {
                 try {
                     await deleteDoc(doc(db, 'users/' + store.state.user.uid + '/cart', item.id));
-                    console.log("Item[id]: " + item.id + " removed from cart")
-                }catch(error){
-                    console.log(error)
+                    console.log("Item[id]: " + item.id + " removed from cart");
+                } catch (error) {
+                    console.log(error);
                 }
-            })
+            }
         }
     },
     computed: {
+        // Returns the total price of all items combined
         getTotals() {
             let total = 0
             this.cartItems.forEach(item => {
@@ -216,9 +249,15 @@ export default {
             })
             return total.toFixed(2)
         },
+        // For checking if cart is empty (used for disabling place order button)
         isCartEmpty() {
             return this.cartItems.length === 0
         }
+    },
+    beforeRouteLeave(to, from, next) {
+        // Unsubscribe from the listener before leaving the component
+        this.ssListener();
+        next();
     }
 }
 </script>

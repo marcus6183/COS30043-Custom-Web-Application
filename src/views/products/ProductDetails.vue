@@ -63,7 +63,8 @@ export default {
             similarProducts: [],
             quantity: 1,
             stockStatus: '',
-            isLoading: true
+            isLoading: true,
+            ssListener: null
         }
     },
     mounted() {
@@ -101,7 +102,7 @@ export default {
         fetchProduct() {
             // resets the quantity
             this.quantity = 1
-            onSnapshot(collection(db, 'products'), (querySnapshot) => {
+            this.ssListener = onSnapshot(collection(db, 'products'), (querySnapshot) => {
                 const tempProducts = []
                 querySnapshot.forEach((doc) => {
                     const product = {
@@ -218,15 +219,28 @@ export default {
             }
         }
     },
+    
     beforeRouteUpdate(to, from, next) {
         // update the component's data when the route parameter changes
         this.fetchProduct();
+        next();
+    },
+    beforeRouteLeave(to, from, next) {
+        // Unsubscribe from the listener before leaving the component
+        this.ssListener();
         next();
     }
 }
 </script>
 
 <style scoped>
+.loading {
+	height: calc(100vh - 240px);
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
 .container-fluid {
     min-height: 100vh;
     opacity: 0;

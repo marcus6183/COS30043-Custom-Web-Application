@@ -74,11 +74,12 @@ export default {
             products: [],
             productText: '',
             resultsCount: 0,
-            isLoading: true
+            isLoading: true,
+            ssListener: null
         }
     },
     mounted() {
-        onSnapshot(collection(db, 'products'), (querySnapshot) => {
+        this.ssListener = onSnapshot(collection(db, 'products'), (querySnapshot) => {
             const tempProducts = []
             querySnapshot.forEach((doc) => {
                 const product = {
@@ -139,6 +140,11 @@ export default {
             this.resultsCount = tempList.length
             return tempList
         }
+    },
+    beforeRouteLeave(to, from, next) {
+        // Unsubscribe from the listener before leaving the component
+        this.ssListener();
+        next();
     }
 }
 </script>
