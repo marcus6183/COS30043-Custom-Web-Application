@@ -12,14 +12,14 @@
             <div class="detailContainer col-lg-6 p-0">
                 <div class="upper col p-5 d-flex flex-column align-items-center">
                     <h2><strong>[{{ stockStatus }}] {{ product.name }}</strong></h2><br>
-                    <h4>RM {{ product.price }}</h4>
+                    <h4 v-if="product.price">RM {{ product.price.toFixed(2) }}</h4>
                     <h5>Quantity</h5>
                     <div class="wrapper mb-3">
                         <span type="button" class="minus" @click="updateQty(-1)">-</span>
                         <input type="number" class="num" :placeholder="quantity" v-model="quantity">
                         <span type="button" class="plus" @click="updateQty(1)">+</span>
                     </div>
-                    <button class="addToCartBtn" @click="addToCart(product.id)">Add to cart</button>
+                    <button :disabled="disableOrderBtn" class="addToCartBtn" @click="addToCart(product.id)">Add to cart</button>
                 </div>
                 <div class="lower p-5">
                     <h3 class="descText">Description</h3>
@@ -63,6 +63,7 @@ export default {
             similarProducts: [],
             quantity: 1,
             stockStatus: '',
+            disableOrderBtn: false,
             isLoading: true,
             ssListener: null
         }
@@ -71,34 +72,6 @@ export default {
         this.fetchProduct();
     },
     methods: {
-        // // Fetching the product data
-            // fetch('http://localhost:3000/products')
-            //     .then(res => res.json())
-            //     .then(data => {
-            //         // Filter data to get only the matching product id
-            //         // Array.find() function is used here instead of filter so that it returns an object instead of an array
-            //         this.product = data.find(product => product.id == this.id)
-            //         this.product.price = this.product.price.toFixed(2)
-            //         if(this.product.stock != 0){
-            //             this.stockStatus = "In-Stock"
-            //         }else{
-            //             this.stockStatus = "Out-of-stock"
-            //         }
-            //         // Get array of similar products
-            //         // Filter is used here to exclude the current product and get only products of the same category
-            //         this.similarProducts = data.filter(product => product.id != this.id && product.category == this.product.category).slice(0, 4)
-            //     })
-            //     .catch(err => console.log(err.message))
-            
-            // // Fetching the product descriptions
-            // fetch('http://localhost:3000/productDescription')
-            //     .then(res => res.json())
-            //     .then(data => {
-            //         // Filter data to get only the matching product id
-            //         data = data.find(product => product.id == this.id)
-            //         this.descriptionArray = data.description
-            //     })
-            //     .catch(err => console.log(err.message))
         fetchProduct() {
             // resets the quantity
             this.quantity = 1
@@ -126,10 +99,14 @@ export default {
         filterProduct(tempProducts){
             // Finding product by id
             this.product = tempProducts.find(product => product.id == this.id)
+            
+            // Check the stocks of the product
             if(this.product.stock != 0){
                 this.stockStatus = "In-Stock"
+                this.disableOrderBtn = false
             }else{
                 this.stockStatus = "Out-of-stock"
+                this.disableOrderBtn = true
             }
             // Get array of similar product
             this.similarProducts = tempProducts.filter(product => product.id != this.id && product.category == this.product.category).slice(0, 4)
@@ -194,8 +171,7 @@ export default {
                             icon: 'error',
                             title: 'Error adding product to cart. Please try again later'
                         })
-                    }
-                    
+                    }  
                 // Else -> update the document in the cart collection
                 } else {
                     const docObject = querySnapshot.docs[0] // Assuming that there is only 1 result from the query
@@ -219,7 +195,6 @@ export default {
             }
         }
     },
-    
     beforeRouteUpdate(to, from, next) {
         // update the component's data when the route parameter changes
         this.fetchProduct();
@@ -321,6 +296,10 @@ img {
 
 .addToCartBtn:hover {
     background-color: var(--accentColor1);
+}
+
+.addToCartBtn:disabled {
+    background-color: #a8a8a8;
 }
 
 /* Description */

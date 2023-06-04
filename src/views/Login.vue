@@ -28,7 +28,6 @@ import { useStore } from 'vuex'
 export default {
     setup () {
         const login_form = ref({});
-        // const register_form = ref({});
         const store = useStore();
 
         const login = () => {

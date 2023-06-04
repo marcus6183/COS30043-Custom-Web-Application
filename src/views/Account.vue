@@ -19,9 +19,6 @@
             <div class="userDetails p-3">
                 <div class="titleText p-2">
                     <h3>Account</h3>
-                    <button class="editButton" @click="editProfile()">
-                        <img src="@/assets/icons/icons8-edit-24.png" alt="">
-                    </button>
                 </div>
                 <div class="name">
                     <span class="label">Name: </span>
@@ -61,7 +58,6 @@ export default {
     },
     mounted() {
         this.getUserDetails()
-        console.log('UID is: ' + store.state.user.uid)
         this.ssListener = onSnapshot(collection(db, 'users/' + store.state.user.uid + '/orders'), (querySnapshot) => {
             const tempOrders = []
             if (querySnapshot.empty) {
@@ -73,6 +69,7 @@ export default {
                     const orderObject = {
                         id: doc.id,
                         orderDateTimestamp: doc.data().orderDate,
+                        shippingCost: doc.data().shippingCost,
                         orderTotal: doc.data().orderTotal,
                         status: doc.data().status,
                         orderedItems: doc.data().orderItems
@@ -95,9 +92,6 @@ export default {
             } else {
                 console.log("User doesn't exists")
             }
-        },
-        editProfile() {
-            //TOBEIMPLEMENTED
         }
     },
     beforeRouteLeave(to, from, next) {
@@ -143,7 +137,7 @@ export default {
 
 .titleText {
     display: flex;
-    justify-content: space-between;
+    align-items: flex-start;
 }
 
 /* Accordion */
@@ -168,16 +162,5 @@ export default {
 .data {
     color: var(--accentColor2);
     text-align: end;
-}
-
-.editButton {
-    background: transparent;
-    border: none;
-    padding: 0px;
-    cursor: pointer;
-}
-
-.editButton:hover img {
-    content: url("@/assets/icons/icons8-edit-24-green.png");
 }
 </style>

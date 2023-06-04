@@ -4,7 +4,7 @@
 			<span class="visually-hidden">Loading...</span>
 		</div>
 	</div>
-    <div v-else :class="'container-fluid row ' + (isLoading ? '':'show')">
+    <div :class="'container-fluid row ' + (isLoading ? '':'show')">
         <div class="left col-lg-9 col-md-8 p-3">
             <div class="cart p-3">
                 <div class="d-flex justify-content-between align-items-center p-2">
@@ -39,7 +39,7 @@
                 </div>
                 <div class="items">
                     <span class="label">Items:</span>
-                    <span class="amount">RM{{ getTotals }}</span>
+                    <span class="amount">RM{{ getTotals.toFixed(2) }}</span>
                 </div>
                 <div class="shipping">
                     <span class="label">Shipping:</span>
@@ -48,7 +48,7 @@
                 <hr class="divider">
                 <div class="totalAmount">
                     <span class="label">Total Amount:</span>
-                    <span class="amount">RM {{ (Number(getTotals) + shippingCost).toFixed(2) }}</span>
+                    <span class="amount">RM {{ (getTotals + shippingCost).toFixed(2) }}</span>
                 </div>
                 <button :disabled="isCartEmpty" class="placeOrderBtn" @click="placeOrder">Place Order</button>
             </div>
@@ -144,12 +144,6 @@ export default {
             }
         },
         async placeOrder() {
-            // Set loading animation while processing the order
-            this.isLoading = true
-
-            // Unsubscribe from snapshotListener
-            this.ssListener()
-
             // Sweet Alert settings
             const Toast = Swal.mixin({
                 toast: true,
@@ -167,44 +161,74 @@ export default {
             if(this.cartItems.length != 0){
                 const collectionPath = 'users/' + store.state.user.uid + '/orders'
                 const tempOrderedItems = []
+                const insufficientStockItems = []
 
                 // Populate cart items into tempOrderedItems, keeping only wanted attributes
                 this.cartItems.forEach(item => {
-                    const tempObject = {
-                        prodId: item.prodId,
-                        name: item.name,
-                        imgURL: item.imgURL,
-                        price: item.price,
-                        qty: item.quantity
+                    // Check if the quantity exceeds the item's stock
+                    if(item.quantity <= item.stock){
+                        const tempObject = {
+                            prodId: item.prodId,
+                            name: item.name,
+                            imgURL: item.imgURL,
+                            price: item.price,
+                            qty: item.quantity
+                        }
+                        tempOrderedItems.push(tempObject)
+                    }else{
+                        // Adds the item name to the insufficientStockItems list
+                        insufficientStockItems.push(item.name)
                     }
-                    tempOrderedItems.push(tempObject)
                 })
+                // Checks if there are any items in cart that is insufficient in stock
+                if(insufficientStockItems.length == 0){
+                    // Set loading animation while processing the order
+                    this.isLoading = true
 
-                // Add order data to orders collection
-                try {
-                    await addDoc(collection(db, collectionPath), {
-                        orderDate: serverTimestamp(),
-                        status: "Unfulfilled",
-                        orderTotal: +(this.getTotals + this.shippingCost),
-                        orderItems: tempOrderedItems
+                    // Unsubscribe from snapshotListener
+                    this.ssListener()
+                    // Add order data to orders collection
+                    try { 
+                        await addDoc(collection(db, collectionPath), {
+                            orderDate: serverTimestamp(),
+                            status: "Unfulfilled",
+                            shippingCost: this.shippingCost,
+                            orderTotal: this.getTotals,
+                            orderItems: tempOrderedItems
+                        })
+                        // Calls updateStocks() and clearCart() once orders has been added
+                        await this.updateStocks()
+                        await this.clearCart()
+
+                        // Subscribe back to snapshotListener
+                        this.snapshotListener()
+
+                        // Show notification that order has been placed
+                        Toast.fire({
+                            icon: 'success',
+                            title: 'Order placed successfully'
+                        })
+                    } catch (error) {
+                        console.log(error)
+                        Toast.fire({
+                            icon: 'error',
+                            title: 'Error adding placing order. Please try again later'
+                        })
+                    }
+                }else{
+                    let listString = ''
+                    insufficientStockItems.forEach(itemName => {
+                        listString += '<li>' + itemName + '</li>'
                     })
-                    // Calls updateStocks() and clearCart() once orders has been added
-                    this.updateStocks()
-                    this.clearCart()
-
-                    // Subscribe back to snapshotListener
-                    this.snapshotListener()
-
-                    // Show notification that order has been placed
-                    Toast.fire({
-                        icon: 'success',
-                        title: 'Order placed successfully'
-                    })
-                } catch (error) {
-                    console.log(error)
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Error adding placing order. Please try again later'
+                    Swal.fire({
+                        title: 'Oops...',
+                        icon: 'info',
+                        html:
+                            '<p>Insufficient stock for the following items</p><br>' +
+                            '<ul>' +
+                            listString +
+                            '</ul>',
+                        confirmButtonColor: '#00bf63'
                     })
                 }
             }else{
@@ -247,7 +271,7 @@ export default {
             this.cartItems.forEach(item => {
                 total += item.price * item.quantity
             })
-            return total.toFixed(2)
+            return total
         },
         // For checking if cart is empty (used for disabling place order button)
         isCartEmpty() {

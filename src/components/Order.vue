@@ -16,8 +16,16 @@
                     <span class="data">{{ orderObject.status }}</span>
                 </div>
                 <div class="wrapper">
-                    <span class="label">Total:</span>
+                    <span class="label">Shipping cost:</span>
+                    <span class="data">RM {{ orderObject.shippingCost.toFixed(2) }}</span>
+                </div>
+                <div class="wrapper">
+                    <span class="label">Total (excl. Shipping Cost):</span>
                     <span class="data">RM {{ orderObject.orderTotal.toFixed(2) }}</span>
+                </div>
+                <div class="wrapper">
+                    <span class="label">Total (incl. Shipping Cost):</span>
+                    <span class="data">RM {{ (orderObject.orderTotal + orderObject.shippingCost).toFixed(2) }}</span>
                 </div>
                 <div class="table-responsive">
                     <table class="table">

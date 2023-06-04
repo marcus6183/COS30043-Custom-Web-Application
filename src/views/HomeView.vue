@@ -52,15 +52,13 @@ export default {
                     featured: doc.data().featured,
                     carousel: doc.data().carousel
                 }
-                tempProducts.push(product)
+				if(product.status == "active"){ // Only display products that are active
+					tempProducts.push(product)
+				}
             })
             this.products = tempProducts
 			this.isLoading = false
         })
-		// fetch('http://localhost:3000/products')
-		// 		.then(res => res.json())
-		// 		.then(data => this.products = data)
-		// 		.catch(err => console.log(err.message))
 	},
 	methods: {
 		getFeaturedProducts() {

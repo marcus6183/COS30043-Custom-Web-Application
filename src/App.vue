@@ -44,7 +44,7 @@ export default {
 }
 
 #app {
-  /* Font used is SFPro-Medium */
+  /* Font used is SFPro-Regular */
   font-family: SFPro-Regular, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
