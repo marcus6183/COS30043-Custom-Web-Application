@@ -107,9 +107,11 @@ td {
     text-align: start;
     vertical-align: middle;
 }
+
 .price {
     text-align: end;
 }
+
 .remove {
     text-align: center;
 }

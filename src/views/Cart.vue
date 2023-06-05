@@ -17,10 +17,10 @@
                             <tr>
                                 <th scope="col" class="col-1">Product</th>
                                 <th scope="col" class="col-6"></th>
-                                <th scope="col" class="col-1">Price</th>
+                                <th scope="col" class="col-1 header-end">Price</th>
                                 <th scope="col" class="col-2">Quantity</th>
-                                <th scope="col" class="col-2">Subtotal</th>
-                                <th scope="col" class="col-1">Remove</th>
+                                <th scope="col" class="col-2 header-end">Subtotal</th>
+                                <th scope="col" class="col-1 header-center">Remove</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -301,7 +301,7 @@ export default {
 }
 
 .container-fluid {
-    min-height: 100vh;
+    min-height: calc(100vh - 240px);
     opacity: 0;
 	transition: opacity 0.5s ease;
 }
@@ -322,6 +322,14 @@ export default {
 th {
     text-align: start;
     vertical-align: middle;
+}
+
+.header-end {
+    text-align: end;
+}
+
+.header-center {
+    text-align: center;
 }
 
 /* Totals container */

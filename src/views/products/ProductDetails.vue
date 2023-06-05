@@ -13,6 +13,7 @@
                 <div class="upper col p-5 d-flex flex-column align-items-center">
                     <h2><strong>[{{ stockStatus }}] {{ product.name }}</strong></h2><br>
                     <h4 v-if="product.price">RM {{ product.price.toFixed(2) }}</h4>
+                    <h5>Stocks available: {{ product.stock }}</h5>
                     <h5>Quantity</h5>
                     <div class="wrapper mb-3">
                         <span type="button" class="minus" @click="updateQty(-1)">-</span>
