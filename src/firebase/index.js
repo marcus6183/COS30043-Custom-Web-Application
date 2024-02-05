@@ -5,12 +5,12 @@ import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDo1ddR2xCWOetgHo6zSG_JXyd13_1a29I",
+  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
   authDomain: "carrotkeebs-db.firebaseapp.com",
   projectId: "carrotkeebs-db",
   storageBucket: "carrotkeebs-db.appspot.com",
-  messagingSenderId: "258107595041",
-  appId: "1:258107595041:web:8c73c617867af7dfc04660"
+  messagingSenderId: process.env.VUE_APP_FIREBASE_SENDER_ID,
+  appId: process.env.VUE_APP_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
